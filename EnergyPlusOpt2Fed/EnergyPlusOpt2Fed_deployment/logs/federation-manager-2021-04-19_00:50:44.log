@@ -1,0 +1,27 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://cpswtng_archiva:8080/repository/snapshots/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://cpswtng_archiva:8080/repository/internal/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[WARNING] Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[WARNING] Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.snapshots (http://cpswtng_archiva:8080/repository/snapshots/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[WARNING] Failure to transfer org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from http://cpswtng_archiva:8080/repository/internal/ was cached in the local repository, resolution will not be reattempted until the update interval of archiva.internal has elapsed or updates are forced. Original error: Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[WARNING] Failure to transfer org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from http://cpswtng_archiva:8080/repository/snapshots/ was cached in the local repository, resolution will not be reattempted until the update interval of archiva.snapshots has elapsed or updates are forced. Original error: Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.snapshots (http://cpswtng_archiva:8080/repository/snapshots/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+Downloading: http://cpswtng_archiva:8080/repository/internal/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+[WARNING] Could not transfer metadata org.cpswt:cpswt-core:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+00:50:54.382 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA definitions were provided!
+00:50:54.384 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA selections were provided!
+00:50:54.385 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No specific COA-selection was specified for execution!
+00:50:54.386 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COAs are used in this experiment.
+
+-------------------------------------------------------------------
+GMS: address=vagrant-33343, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:41437
+-------------------------------------------------------------------
+00:51:06.993 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.host.FederationManagerHostApp - Server online at 0.0.0.0:8083 ...
+00:52:17.728 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 0.0 and step = 1.0 and requested_time = 1.0
+WARN  [VERIFY_SUSPECT.TimerThread,EnergyPlusOpt2Fed1,vagrant-33343] portico.lrc.jgroups: Detected that federate [Controller-0f4744b4-b3e4-428e-a5da-07c9c9105b67] may have crashed, investigating...
+WARN  [Regular] portico.lrc.jgroups: Federate [Controller-0f4744b4-b3e4-428e-a5da-07c9c9105b67] has crashed. Sending fake resignation because it was too rude to.

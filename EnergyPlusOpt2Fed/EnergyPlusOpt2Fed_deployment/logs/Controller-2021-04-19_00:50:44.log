@@ -1,0 +1,105 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+
+-------------------------------------------------------------------
+GMS: address=vagrant-34540, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:34334
+-------------------------------------------------------------------
+00:51:20.169 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToPopulate...
+00:52:17.438 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - ...synchronized on readyToPopulate
+00:52:17.440 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToRun...
+00:52:17.693 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - ...synchronized on readyToRun
+00:52:17.702 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - started logical time progression
+timestep before receiving Socket/Reader: 0.0
+00:52:17.719 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+00:52:17.721 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+00:52:17.831 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+00:52:17.833 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@467518.468750,epSendZoneMeanAirTemp@20.000101,epSendOutdoorAirTemp@2.250000,epSendZoneHumidity@28.944389,epSendEnergyPurchased@467518.468750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@23.000000,timestep@0.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@467518.468750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@467518.468750
+token1[0] = epSendNetEnergy
+token1[1] = 467518.468750
+varNames[j] = epSendNetEnergy
+doubles[j] = 467518.468750
+j = 1
+token = epSendZoneMeanAirTemp@20.000101
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000101
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000101
+j = 2
+token = epSendOutdoorAirTemp@2.250000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.250000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.250000
+j = 3
+token = epSendZoneHumidity@28.944389
+token1[0] = epSendZoneHumidity
+token1[1] = 28.944389
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.944389
+j = 4
+token = epSendEnergyPurchased@467518.468750
+token1[0] = epSendEnergyPurchased
+token1[1] = 467518.468750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 467518.468750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@23.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 23.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 23.000000
+j = 9
+token = timestep@0.0
+token1[0] = timestep
+token1[1] = 0.0
+varNames[j] = timestep
+doubles[j] = 0.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 0.0
+00:52:17.862 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.0
+sblock:0
+zonetemp string20.000101
+Here is the result
+java.lang.ArrayIndexOutOfBoundsException: 1
+determine setpoints loop
+00:52:22.729 [org.webgme.guest.controller.Controller.main()] ERROR org.webgme.guest.controller.Controller - java.lang.NullPointerException

@@ -1,0 +1,2046 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+
+-------------------------------------------------------------------
+GMS: address=vagrant-10641, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:41767
+-------------------------------------------------------------------
+09:40:47.409 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToPopulate...
+09:41:41.101 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - ...synchronized on readyToPopulate
+09:41:41.106 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToRun...
+09:41:41.358 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - ...synchronized on readyToRun
+09:41:41.360 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - started logical time progression
+timestep before receiving Socket/Reader: 0.0
+09:41:41.364 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:41.365 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:41.471 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:41.477 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@467551.687500,epSendZoneMeanAirTemp@20.000101,epSendOutdoorAirTemp@2.250000,epSendZoneHumidity@28.944349,epSendEnergyPurchased@467551.687500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@0.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@467551.687500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@467551.687500
+token1[0] = epSendNetEnergy
+token1[1] = 467551.687500
+varNames[j] = epSendNetEnergy
+doubles[j] = 467551.687500
+j = 1
+token = epSendZoneMeanAirTemp@20.000101
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000101
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000101
+j = 2
+token = epSendOutdoorAirTemp@2.250000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.250000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.250000
+j = 3
+token = epSendZoneHumidity@28.944349
+token1[0] = epSendZoneHumidity
+token1[1] = 28.944349
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.944349
+j = 4
+token = epSendEnergyPurchased@467551.687500
+token1[0] = epSendEnergyPurchased
+token1[1] = 467551.687500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 467551.687500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@0.0
+token1[0] = timestep
+token1[1] = 0.0
+varNames[j] = timestep
+doubles[j] = 0.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 0.0
+09:41:41.534 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.0
+sblock:0
+zonetemp stirng20.000101
+Here is the result
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.90e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+
+     pcost       dcost       gap    pres   dres   k/t
+ 0:  1.0520e+01 -2.1359e+02  6e+02  6e-01  2e-15  1e+00
+ 1:  7.6148e+00 -2.8282e+01  6e+01  1e-01  3e-15  7e-01
+ 2:  5.1443e+00  1.9639e-01  6e+00  1e-02  6e-15  5e-03
+ 3:  4.2636e+00  2.4612e+00  2e+00  5e-03  2e-15  5e-03
+ 4:  3.9158e+00  2.8262e+00  1e+00  3e-03  1e-15  4e-03
+ 5:  3.7224e+00  3.5457e+00  2e-01  5e-04  4e-16  7e-04
+ 6:  3.6894e+00  3.6751e+00  1e-02  4e-05  4e-16  6e-05
+ 7:  3.6865e+00  3.6864e+00  1e-04  4e-07  3e-16  6e-07
+ 8:  3.6865e+00  3.6865e+00  1e-06  4e-09  4e-16  6e-09
+Optimal solution found.
+energy consumption
+0.183543857236
+0.19304494012
+0.199555389847
+0.204279574652
+0.209436760453
+0.216923436775
+0.225854169629
+0.232757928423
+0.241169342222
+0.245854156253
+0.261292801872
+0.263803947901
+0.250206996758
+indoor temp prediction
+20.0000000598
+20.0000000594
+20.0000000573
+20.0000000627
+20.0000000684
+20.0000000711
+20.000000073
+20.0000000754
+20.0000000791
+20.0000000783
+20.000000079
+20.00000008
+20.0000000808
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000598,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 0.0
+timestep before receiving Socket/Reader: 1.0
+09:41:43.722 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:43.723 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:43.831 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:43.833 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@461741.343750,epSendZoneMeanAirTemp@20.000019,epSendOutdoorAirTemp@2.341667,epSendZoneHumidity@28.929440,epSendEnergyPurchased@461741.343750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@1.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@461741.343750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@461741.343750
+token1[0] = epSendNetEnergy
+token1[1] = 461741.343750
+varNames[j] = epSendNetEnergy
+doubles[j] = 461741.343750
+j = 1
+token = epSendZoneMeanAirTemp@20.000019
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000019
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000019
+j = 2
+token = epSendOutdoorAirTemp@2.341667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.341667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.341667
+j = 3
+token = epSendZoneHumidity@28.929440
+token1[0] = epSendZoneHumidity
+token1[1] = 28.929440
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.929440
+j = 4
+token = epSendEnergyPurchased@461741.343750
+token1[0] = epSendEnergyPurchased
+token1[1] = 461741.343750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 461741.343750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@1.0
+token1[0] = timestep
+token1[1] = 1.0
+varNames[j] = timestep
+doubles[j] = 1.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 1.0
+09:41:43.849 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.08333333333333333
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000594,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 1.0
+timestep before receiving Socket/Reader: 2.0
+09:41:44.023 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:44.023 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:44.129 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:44.130 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@463352.062500,epSendZoneMeanAirTemp@20.000027,epSendOutdoorAirTemp@2.483333,epSendZoneHumidity@28.929176,epSendEnergyPurchased@463352.062500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@2.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@463352.062500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@463352.062500
+token1[0] = epSendNetEnergy
+token1[1] = 463352.062500
+varNames[j] = epSendNetEnergy
+doubles[j] = 463352.062500
+j = 1
+token = epSendZoneMeanAirTemp@20.000027
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000027
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000027
+j = 2
+token = epSendOutdoorAirTemp@2.483333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.483333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.483333
+j = 3
+token = epSendZoneHumidity@28.929176
+token1[0] = epSendZoneHumidity
+token1[1] = 28.929176
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.929176
+j = 4
+token = epSendEnergyPurchased@463352.062500
+token1[0] = epSendEnergyPurchased
+token1[1] = 463352.062500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 463352.062500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@2.0
+token1[0] = timestep
+token1[1] = 2.0
+varNames[j] = timestep
+doubles[j] = 2.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 2.0
+09:41:44.133 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.16666666666666666
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000573,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 2.0
+timestep before receiving Socket/Reader: 3.0
+09:41:44.776 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:44.777 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:44.884 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:44.885 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@464966.187500,epSendZoneMeanAirTemp@20.000034,epSendOutdoorAirTemp@2.625000,epSendZoneHumidity@28.940521,epSendEnergyPurchased@464966.187500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@3.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@464966.187500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@464966.187500
+token1[0] = epSendNetEnergy
+token1[1] = 464966.187500
+varNames[j] = epSendNetEnergy
+doubles[j] = 464966.187500
+j = 1
+token = epSendZoneMeanAirTemp@20.000034
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000034
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000034
+j = 2
+token = epSendOutdoorAirTemp@2.625000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.625000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.625000
+j = 3
+token = epSendZoneHumidity@28.940521
+token1[0] = epSendZoneHumidity
+token1[1] = 28.940521
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.940521
+j = 4
+token = epSendEnergyPurchased@464966.187500
+token1[0] = epSendEnergyPurchased
+token1[1] = 464966.187500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 464966.187500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@3.0
+token1[0] = timestep
+token1[1] = 3.0
+varNames[j] = timestep
+doubles[j] = 3.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 3.0
+09:41:44.900 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.25
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000627,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 3.0
+timestep before receiving Socket/Reader: 4.0
+09:41:45.762 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:45.765 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:45.872 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:45.873 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@466516.781250,epSendZoneMeanAirTemp@20.000046,epSendOutdoorAirTemp@2.766667,epSendZoneHumidity@28.963278,epSendEnergyPurchased@466516.781250,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@4.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@466516.781250
+length of vars = 10
+j = 0
+token = epSendNetEnergy@466516.781250
+token1[0] = epSendNetEnergy
+token1[1] = 466516.781250
+varNames[j] = epSendNetEnergy
+doubles[j] = 466516.781250
+j = 1
+token = epSendZoneMeanAirTemp@20.000046
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000046
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000046
+j = 2
+token = epSendOutdoorAirTemp@2.766667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.766667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.766667
+j = 3
+token = epSendZoneHumidity@28.963278
+token1[0] = epSendZoneHumidity
+token1[1] = 28.963278
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.963278
+j = 4
+token = epSendEnergyPurchased@466516.781250
+token1[0] = epSendEnergyPurchased
+token1[1] = 466516.781250
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 466516.781250
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@4.0
+token1[0] = timestep
+token1[1] = 4.0
+varNames[j] = timestep
+doubles[j] = 4.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 4.0
+09:41:45.881 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.3333333333333333
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000684,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 4.0
+timestep before receiving Socket/Reader: 5.0
+09:41:46.766 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:46.766 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:46.874 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:46.875 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@468031.468750,epSendZoneMeanAirTemp@20.000057,epSendOutdoorAirTemp@2.908333,epSendZoneHumidity@28.997002,epSendEnergyPurchased@468031.468750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@5.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@468031.468750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@468031.468750
+token1[0] = epSendNetEnergy
+token1[1] = 468031.468750
+varNames[j] = epSendNetEnergy
+doubles[j] = 468031.468750
+j = 1
+token = epSendZoneMeanAirTemp@20.000057
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000057
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000057
+j = 2
+token = epSendOutdoorAirTemp@2.908333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 2.908333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 2.908333
+j = 3
+token = epSendZoneHumidity@28.997002
+token1[0] = epSendZoneHumidity
+token1[1] = 28.997002
+varNames[j] = epSendZoneHumidity
+doubles[j] = 28.997002
+j = 4
+token = epSendEnergyPurchased@468031.468750
+token1[0] = epSendEnergyPurchased
+token1[1] = 468031.468750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 468031.468750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@5.0
+token1[0] = timestep
+token1[1] = 5.0
+varNames[j] = timestep
+doubles[j] = 5.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 5.0
+09:41:46.881 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.4166666666666667
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000711,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 5.0
+timestep before receiving Socket/Reader: 6.0
+09:41:47.777 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:47.781 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:47.890 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:47.893 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@469535.625000,epSendZoneMeanAirTemp@20.000069,epSendOutdoorAirTemp@3.050000,epSendZoneHumidity@29.041349,epSendEnergyPurchased@469535.625000,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@6.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@469535.625000
+length of vars = 10
+j = 0
+token = epSendNetEnergy@469535.625000
+token1[0] = epSendNetEnergy
+token1[1] = 469535.625000
+varNames[j] = epSendNetEnergy
+doubles[j] = 469535.625000
+j = 1
+token = epSendZoneMeanAirTemp@20.000069
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000069
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000069
+j = 2
+token = epSendOutdoorAirTemp@3.050000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.050000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.050000
+j = 3
+token = epSendZoneHumidity@29.041349
+token1[0] = epSendZoneHumidity
+token1[1] = 29.041349
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.041349
+j = 4
+token = epSendEnergyPurchased@469535.625000
+token1[0] = epSendEnergyPurchased
+token1[1] = 469535.625000
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 469535.625000
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@6.0
+token1[0] = timestep
+token1[1] = 6.0
+varNames[j] = timestep
+doubles[j] = 6.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 6.0
+09:41:47.899 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.5
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.000000073,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 6.0
+timestep before receiving Socket/Reader: 7.0
+09:41:48.783 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:48.783 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:48.889 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:48.891 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@471009.593750,epSendZoneMeanAirTemp@20.000082,epSendOutdoorAirTemp@3.191667,epSendZoneHumidity@29.096088,epSendEnergyPurchased@471009.593750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@7.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@471009.593750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@471009.593750
+token1[0] = epSendNetEnergy
+token1[1] = 471009.593750
+varNames[j] = epSendNetEnergy
+doubles[j] = 471009.593750
+j = 1
+token = epSendZoneMeanAirTemp@20.000082
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000082
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000082
+j = 2
+token = epSendOutdoorAirTemp@3.191667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.191667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.191667
+j = 3
+token = epSendZoneHumidity@29.096088
+token1[0] = epSendZoneHumidity
+token1[1] = 29.096088
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.096088
+j = 4
+token = epSendEnergyPurchased@471009.593750
+token1[0] = epSendEnergyPurchased
+token1[1] = 471009.593750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 471009.593750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@7.0
+token1[0] = timestep
+token1[1] = 7.0
+varNames[j] = timestep
+doubles[j] = 7.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 7.0
+09:41:48.897 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.5833333333333334
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000754,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 7.0
+timestep before receiving Socket/Reader: 8.0
+09:41:49.803 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:49.804 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:49.909 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:49.909 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@472447.812500,epSendZoneMeanAirTemp@20.000093,epSendOutdoorAirTemp@3.333333,epSendZoneHumidity@29.161047,epSendEnergyPurchased@472447.812500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@8.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@472447.812500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@472447.812500
+token1[0] = epSendNetEnergy
+token1[1] = 472447.812500
+varNames[j] = epSendNetEnergy
+doubles[j] = 472447.812500
+j = 1
+token = epSendZoneMeanAirTemp@20.000093
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000093
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000093
+j = 2
+token = epSendOutdoorAirTemp@3.333333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.333333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.333333
+j = 3
+token = epSendZoneHumidity@29.161047
+token1[0] = epSendZoneHumidity
+token1[1] = 29.161047
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.161047
+j = 4
+token = epSendEnergyPurchased@472447.812500
+token1[0] = epSendEnergyPurchased
+token1[1] = 472447.812500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 472447.812500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@8.0
+token1[0] = timestep
+token1[1] = 8.0
+varNames[j] = timestep
+doubles[j] = 8.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 8.0
+09:41:49.917 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.6666666666666666
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000791,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 8.0
+timestep before receiving Socket/Reader: 9.0
+09:41:50.794 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:50.796 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:50.903 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:50.904 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@473857.531250,epSendZoneMeanAirTemp@20.000109,epSendOutdoorAirTemp@3.475000,epSendZoneHumidity@29.236071,epSendEnergyPurchased@473857.531250,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@9.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@473857.531250
+length of vars = 10
+j = 0
+token = epSendNetEnergy@473857.531250
+token1[0] = epSendNetEnergy
+token1[1] = 473857.531250
+varNames[j] = epSendNetEnergy
+doubles[j] = 473857.531250
+j = 1
+token = epSendZoneMeanAirTemp@20.000109
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000109
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000109
+j = 2
+token = epSendOutdoorAirTemp@3.475000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.475000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.475000
+j = 3
+token = epSendZoneHumidity@29.236071
+token1[0] = epSendZoneHumidity
+token1[1] = 29.236071
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.236071
+j = 4
+token = epSendEnergyPurchased@473857.531250
+token1[0] = epSendEnergyPurchased
+token1[1] = 473857.531250
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 473857.531250
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@9.0
+token1[0] = timestep
+token1[1] = 9.0
+varNames[j] = timestep
+doubles[j] = 9.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 9.0
+09:41:50.911 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.75
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000783,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 9.0
+timestep before receiving Socket/Reader: 10.0
+09:41:51.801 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:51.803 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:51.914 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:51.919 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@475242.781250,epSendZoneMeanAirTemp@20.000122,epSendOutdoorAirTemp@3.616667,epSendZoneHumidity@29.321014,epSendEnergyPurchased@475242.781250,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@10.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@475242.781250
+length of vars = 10
+j = 0
+token = epSendNetEnergy@475242.781250
+token1[0] = epSendNetEnergy
+token1[1] = 475242.781250
+varNames[j] = epSendNetEnergy
+doubles[j] = 475242.781250
+j = 1
+token = epSendZoneMeanAirTemp@20.000122
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000122
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000122
+j = 2
+token = epSendOutdoorAirTemp@3.616667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.616667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.616667
+j = 3
+token = epSendZoneHumidity@29.321014
+token1[0] = epSendZoneHumidity
+token1[1] = 29.321014
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.321014
+j = 4
+token = epSendEnergyPurchased@475242.781250
+token1[0] = epSendEnergyPurchased
+token1[1] = 475242.781250
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 475242.781250
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@10.0
+token1[0] = timestep
+token1[1] = 10.0
+varNames[j] = timestep
+doubles[j] = 10.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 10.0
+09:41:51.924 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.8333333333333334
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.000000079,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 10.0
+timestep before receiving Socket/Reader: 11.0
+09:41:52.804 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:52.805 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:52.912 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:52.915 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@476606.843750,epSendZoneMeanAirTemp@20.000137,epSendOutdoorAirTemp@3.758333,epSendZoneHumidity@29.415743,epSendEnergyPurchased@476606.843750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@11.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@476606.843750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@476606.843750
+token1[0] = epSendNetEnergy
+token1[1] = 476606.843750
+varNames[j] = epSendNetEnergy
+doubles[j] = 476606.843750
+j = 1
+token = epSendZoneMeanAirTemp@20.000137
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000137
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000137
+j = 2
+token = epSendOutdoorAirTemp@3.758333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.758333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.758333
+j = 3
+token = epSendZoneHumidity@29.415743
+token1[0] = epSendZoneHumidity
+token1[1] = 29.415743
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.415743
+j = 4
+token = epSendEnergyPurchased@476606.843750
+token1[0] = epSendEnergyPurchased
+token1[1] = 476606.843750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 476606.843750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@11.0
+token1[0] = timestep
+token1[1] = 11.0
+varNames[j] = timestep
+doubles[j] = 11.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 11.0
+09:41:52.927 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.9166666666666666
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.00000008,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 11.0
+timestep before receiving Socket/Reader: 12.0
+09:41:53.807 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:53.809 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:53.919 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:53.920 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@477949.656250,epSendZoneMeanAirTemp@20.000154,epSendOutdoorAirTemp@3.900000,epSendZoneHumidity@29.520124,epSendEnergyPurchased@477949.656250,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@12.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@477949.656250
+length of vars = 10
+j = 0
+token = epSendNetEnergy@477949.656250
+token1[0] = epSendNetEnergy
+token1[1] = 477949.656250
+varNames[j] = epSendNetEnergy
+doubles[j] = 477949.656250
+j = 1
+token = epSendZoneMeanAirTemp@20.000154
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000154
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000154
+j = 2
+token = epSendOutdoorAirTemp@3.900000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.900000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.900000
+j = 3
+token = epSendZoneHumidity@29.520124
+token1[0] = epSendZoneHumidity
+token1[1] = 29.520124
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.520124
+j = 4
+token = epSendEnergyPurchased@477949.656250
+token1[0] = epSendEnergyPurchased
+token1[1] = 477949.656250
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 477949.656250
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@12.0
+token1[0] = timestep
+token1[1] = 12.0
+varNames[j] = timestep
+doubles[j] = 12.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 12.0
+09:41:53.920 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.0
+sblock:1
+zonetemp stirng20.000154
+Here is the result
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.84e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.87e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.85e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+[ 2.89e-01]
+
+     pcost       dcost       gap    pres   dres   k/t
+ 0:  1.0537e+01 -2.1377e+02  6e+02  6e-01  2e-15  1e+00
+ 1:  7.6526e+00 -3.1164e+01  7e+01  1e-01  3e-15  7e-01
+ 2:  5.1560e+00 -7.0790e-01  7e+00  2e-02  8e-15  2e-02
+ 3:  4.3131e+00  2.5804e+00  2e+00  5e-03  3e-15  7e-03
+ 4:  3.9452e+00  2.8755e+00  1e+00  3e-03  2e-15  5e-03
+ 5:  3.7462e+00  3.5539e+00  2e-01  5e-04  7e-16  1e-03
+ 6:  3.7071e+00  3.6928e+00  1e-02  4e-05  5e-16  7e-05
+ 7:  3.7040e+00  3.7039e+00  1e-04  4e-07  4e-16  7e-07
+ 8:  3.7040e+00  3.7040e+00  1e-06  4e-09  3e-16  7e-09
+Optimal solution found.
+energy consumption
+0.155637496913
+0.164632141
+0.171469570225
+0.177085553552
+0.183270963617
+0.191124333571
+0.200219922238
+0.207963957056
+0.216988128976
+0.222917560972
+0.237801882857
+0.242466821747
+0.234560318459
+indoor temp prediction
+20.0000000683
+20.0000000735
+20.0000000693
+20.0000000687
+20.0000000726
+20.0000000761
+20.0000000786
+20.0000000818
+20.000000087
+20.0000000886
+20.0000000883
+20.0000000918
+20.0000000905
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000683,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 12.0
+timestep before receiving Socket/Reader: 13.0
+09:41:56.011 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:56.015 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:56.122 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:56.123 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@475872.281250,epSendZoneMeanAirTemp@20.000153,epSendOutdoorAirTemp@3.941667,epSendZoneHumidity@29.635565,epSendEnergyPurchased@475872.281250,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@13.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@475872.281250
+length of vars = 10
+j = 0
+token = epSendNetEnergy@475872.281250
+token1[0] = epSendNetEnergy
+token1[1] = 475872.281250
+varNames[j] = epSendNetEnergy
+doubles[j] = 475872.281250
+j = 1
+token = epSendZoneMeanAirTemp@20.000153
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000153
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000153
+j = 2
+token = epSendOutdoorAirTemp@3.941667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.941667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.941667
+j = 3
+token = epSendZoneHumidity@29.635565
+token1[0] = epSendZoneHumidity
+token1[1] = 29.635565
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.635565
+j = 4
+token = epSendEnergyPurchased@475872.281250
+token1[0] = epSendEnergyPurchased
+token1[1] = 475872.281250
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 475872.281250
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@13.0
+token1[0] = timestep
+token1[1] = 13.0
+varNames[j] = timestep
+doubles[j] = 13.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 13.0
+09:41:56.128 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.0833333333333333
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000735,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 13.0
+timestep before receiving Socket/Reader: 14.0
+09:41:56.277 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:56.278 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:56.384 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:56.385 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@473756.437500,epSendZoneMeanAirTemp@20.000151,epSendOutdoorAirTemp@3.983333,epSendZoneHumidity@29.740074,epSendEnergyPurchased@473756.437500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@14.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@473756.437500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@473756.437500
+token1[0] = epSendNetEnergy
+token1[1] = 473756.437500
+varNames[j] = epSendNetEnergy
+doubles[j] = 473756.437500
+j = 1
+token = epSendZoneMeanAirTemp@20.000151
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000151
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000151
+j = 2
+token = epSendOutdoorAirTemp@3.983333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 3.983333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 3.983333
+j = 3
+token = epSendZoneHumidity@29.740074
+token1[0] = epSendZoneHumidity
+token1[1] = 29.740074
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.740074
+j = 4
+token = epSendEnergyPurchased@473756.437500
+token1[0] = epSendEnergyPurchased
+token1[1] = 473756.437500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 473756.437500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@14.0
+token1[0] = timestep
+token1[1] = 14.0
+varNames[j] = timestep
+doubles[j] = 14.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 14.0
+09:41:56.391 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.1666666666666667
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000693,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 14.0
+timestep before receiving Socket/Reader: 15.0
+09:41:57.054 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:57.055 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:57.172 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:57.172 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@471585.937500,epSendZoneMeanAirTemp@20.000149,epSendOutdoorAirTemp@4.025000,epSendZoneHumidity@29.831514,epSendEnergyPurchased@471585.937500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@15.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@471585.937500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@471585.937500
+token1[0] = epSendNetEnergy
+token1[1] = 471585.937500
+varNames[j] = epSendNetEnergy
+doubles[j] = 471585.937500
+j = 1
+token = epSendZoneMeanAirTemp@20.000149
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000149
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000149
+j = 2
+token = epSendOutdoorAirTemp@4.025000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 4.025000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 4.025000
+j = 3
+token = epSendZoneHumidity@29.831514
+token1[0] = epSendZoneHumidity
+token1[1] = 29.831514
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.831514
+j = 4
+token = epSendEnergyPurchased@471585.937500
+token1[0] = epSendEnergyPurchased
+token1[1] = 471585.937500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 471585.937500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@15.0
+token1[0] = timestep
+token1[1] = 15.0
+varNames[j] = timestep
+doubles[j] = 15.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 15.0
+09:41:57.173 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.25
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000687,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 15.0
+timestep before receiving Socket/Reader: 16.0
+09:41:58.057 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:58.057 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:58.163 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:58.164 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@469367.468750,epSendZoneMeanAirTemp@20.000147,epSendOutdoorAirTemp@4.066667,epSendZoneHumidity@29.910034,epSendEnergyPurchased@469367.468750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@16.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@469367.468750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@469367.468750
+token1[0] = epSendNetEnergy
+token1[1] = 469367.468750
+varNames[j] = epSendNetEnergy
+doubles[j] = 469367.468750
+j = 1
+token = epSendZoneMeanAirTemp@20.000147
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000147
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000147
+j = 2
+token = epSendOutdoorAirTemp@4.066667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 4.066667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 4.066667
+j = 3
+token = epSendZoneHumidity@29.910034
+token1[0] = epSendZoneHumidity
+token1[1] = 29.910034
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.910034
+j = 4
+token = epSendEnergyPurchased@469367.468750
+token1[0] = epSendEnergyPurchased
+token1[1] = 469367.468750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 469367.468750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@16.0
+token1[0] = timestep
+token1[1] = 16.0
+varNames[j] = timestep
+doubles[j] = 16.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 16.0
+09:41:58.169 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.3333333333333333
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000726,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 16.0
+timestep before receiving Socket/Reader: 17.0
+09:41:59.058 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:41:59.059 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:59.166 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:41:59.167 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@467098.968750,epSendZoneMeanAirTemp@20.000147,epSendOutdoorAirTemp@4.108333,epSendZoneHumidity@29.976192,epSendEnergyPurchased@467098.968750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@17.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@467098.968750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@467098.968750
+token1[0] = epSendNetEnergy
+token1[1] = 467098.968750
+varNames[j] = epSendNetEnergy
+doubles[j] = 467098.968750
+j = 1
+token = epSendZoneMeanAirTemp@20.000147
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000147
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000147
+j = 2
+token = epSendOutdoorAirTemp@4.108333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 4.108333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 4.108333
+j = 3
+token = epSendZoneHumidity@29.976192
+token1[0] = epSendZoneHumidity
+token1[1] = 29.976192
+varNames[j] = epSendZoneHumidity
+doubles[j] = 29.976192
+j = 4
+token = epSendEnergyPurchased@467098.968750
+token1[0] = epSendEnergyPurchased
+token1[1] = 467098.968750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 467098.968750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@17.0
+token1[0] = timestep
+token1[1] = 17.0
+varNames[j] = timestep
+doubles[j] = 17.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 17.0
+09:41:59.174 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.4166666666666667
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000761,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 17.0
+timestep before receiving Socket/Reader: 18.0
+09:42:00.066 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:42:00.067 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:42:00.174 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:42:00.175 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@464778.718750,epSendZoneMeanAirTemp@20.000147,epSendOutdoorAirTemp@4.150000,epSendZoneHumidity@30.030397,epSendEnergyPurchased@464778.718750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@18.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@464778.718750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@464778.718750
+token1[0] = epSendNetEnergy
+token1[1] = 464778.718750
+varNames[j] = epSendNetEnergy
+doubles[j] = 464778.718750
+j = 1
+token = epSendZoneMeanAirTemp@20.000147
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000147
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000147
+j = 2
+token = epSendOutdoorAirTemp@4.150000
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 4.150000
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 4.150000
+j = 3
+token = epSendZoneHumidity@30.030397
+token1[0] = epSendZoneHumidity
+token1[1] = 30.030397
+varNames[j] = epSendZoneHumidity
+doubles[j] = 30.030397
+j = 4
+token = epSendEnergyPurchased@464778.718750
+token1[0] = epSendEnergyPurchased
+token1[1] = 464778.718750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 464778.718750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@18.0
+token1[0] = timestep
+token1[1] = 18.0
+varNames[j] = timestep
+doubles[j] = 18.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 18.0
+09:42:00.182 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.5
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000786,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 18.0
+timestep before receiving Socket/Reader: 19.0
+09:42:01.058 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:42:01.061 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:42:01.170 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:42:01.179 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@462404.968750,epSendZoneMeanAirTemp@20.000147,epSendOutdoorAirTemp@4.191667,epSendZoneHumidity@30.072895,epSendEnergyPurchased@462404.968750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@19.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@462404.968750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@462404.968750
+token1[0] = epSendNetEnergy
+token1[1] = 462404.968750
+varNames[j] = epSendNetEnergy
+doubles[j] = 462404.968750
+j = 1
+token = epSendZoneMeanAirTemp@20.000147
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000147
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000147
+j = 2
+token = epSendOutdoorAirTemp@4.191667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 4.191667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 4.191667
+j = 3
+token = epSendZoneHumidity@30.072895
+token1[0] = epSendZoneHumidity
+token1[1] = 30.072895
+varNames[j] = epSendZoneHumidity
+doubles[j] = 30.072895
+j = 4
+token = epSendEnergyPurchased@462404.968750
+token1[0] = epSendEnergyPurchased
+token1[1] = 462404.968750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 462404.968750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@19.0
+token1[0] = timestep
+token1[1] = 19.0
+varNames[j] = timestep
+doubles[j] = 19.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 19.0
+09:42:01.199 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.5833333333333333
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.0000000818,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 19.0
+timestep before receiving Socket/Reader: 20.0
+09:42:02.063 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+09:42:02.064 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:42:02.173 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+09:42:02.174 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@459975.968750,epSendZoneMeanAirTemp@20.000147,epSendOutdoorAirTemp@4.233333,epSendZoneHumidity@30.103861,epSendEnergyPurchased@459975.968750,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@28.000000,timestep@20.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@459975.968750
+length of vars = 10
+j = 0
+token = epSendNetEnergy@459975.968750
+token1[0] = epSendNetEnergy
+token1[1] = 459975.968750
+varNames[j] = epSendNetEnergy
+doubles[j] = 459975.968750
+j = 1
+token = epSendZoneMeanAirTemp@20.000147
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000147
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000147
+j = 2
+token = epSendOutdoorAirTemp@4.233333
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 4.233333
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 4.233333
+j = 3
+token = epSendZoneHumidity@30.103861
+token1[0] = epSendZoneHumidity
+token1[1] = 30.103861
+varNames[j] = epSendZoneHumidity
+doubles[j] = 30.103861
+j = 4
+token = epSendEnergyPurchased@459975.968750
+token1[0] = epSendEnergyPurchased
+token1[1] = 459975.968750
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 459975.968750
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@28.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 28.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 28.000000
+j = 9
+token = timestep@20.0
+token1[0] = timestep
+token1[1] = 20.0
+varNames[j] = timestep
+doubles[j] = 20.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 20.0
+09:42:02.195 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:1.6666666666666667
+determine setpoints loop
+send to sockets interactions loop
+dataStrings[simID] = epGetStartCooling@30.2,epGetStartHeating@20.000000087,
+Send sendControls interaction: 30.2 to socket #0
+timestep after sending Socket... should advance after this: 20.0

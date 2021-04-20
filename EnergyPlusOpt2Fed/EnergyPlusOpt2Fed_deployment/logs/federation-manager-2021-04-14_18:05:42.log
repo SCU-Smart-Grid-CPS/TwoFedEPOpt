@@ -1,0 +1,22 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://cpswtng_archiva:8080/repository/internal/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[WARNING] Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[WARNING] Failure to transfer org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from http://cpswtng_archiva:8080/repository/internal/ was cached in the local repository, resolution will not be reattempted until the update interval of archiva.internal has elapsed or updates are forced. Original error: Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+Downloading: http://cpswtng_archiva:8080/repository/internal/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+[WARNING] Could not transfer metadata org.cpswt:cpswt-core:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+18:05:48.821 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA definitions were provided!
+18:05:48.823 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA selections were provided!
+18:05:48.824 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No specific COA-selection was specified for execution!
+18:05:48.825 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COAs are used in this experiment.
+
+-------------------------------------------------------------------
+GMS: address=vagrant-29302, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:44993
+-------------------------------------------------------------------
+18:05:58.623 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.host.FederationManagerHostApp - Server online at 0.0.0.0:8083 ...
+18:07:05.210 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 0.0 and step = 1.0 and requested_time = 1.0

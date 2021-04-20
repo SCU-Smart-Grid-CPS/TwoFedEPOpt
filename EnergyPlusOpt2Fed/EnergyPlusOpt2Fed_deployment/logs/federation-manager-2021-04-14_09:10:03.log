@@ -1,0 +1,52 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://cpswtng_archiva:8080/repository/internal/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[WARNING] Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[WARNING] Failure to transfer org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from http://cpswtng_archiva:8080/repository/internal/ was cached in the local repository, resolution will not be reattempted until the update interval of archiva.internal has elapsed or updates are forced. Original error: Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+Downloading: http://cpswtng_archiva:8080/repository/internal/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+[WARNING] Could not transfer metadata org.cpswt:cpswt-core:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Connect to cpswtng_archiva:8080 [cpswtng_archiva/127.0.0.1] failed: Connection refused (Connection refused)
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+09:10:10.656 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA definitions were provided!
+09:10:10.659 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA selections were provided!
+09:10:10.660 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No specific COA-selection was specified for execution!
+09:10:10.661 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COAs are used in this experiment.
+
+-------------------------------------------------------------------
+GMS: address=vagrant-26475, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:34373
+-------------------------------------------------------------------
+09:10:20.635 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.host.FederationManagerHostApp - Server online at 0.0.0.0:8083 ...
+09:11:35.641 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 0.0 and step = 1.0 and requested_time = 1.0
+09:11:36.654 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 1.0 and step = 1.0 and requested_time = 2.0
+09:11:37.655 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 2.0 and step = 1.0 and requested_time = 3.0
+09:11:38.663 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 3.0 and step = 1.0 and requested_time = 4.0
+09:11:39.666 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 4.0 and step = 1.0 and requested_time = 5.0
+09:11:40.673 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 5.0 and step = 1.0 and requested_time = 6.0
+09:11:41.674 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 6.0 and step = 1.0 and requested_time = 7.0
+09:11:42.676 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 7.0 and step = 1.0 and requested_time = 8.0
+09:11:43.677 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 8.0 and step = 1.0 and requested_time = 9.0
+09:11:44.679 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 9.0 and step = 1.0 and requested_time = 10.0
+09:11:44.684 [Thread-3] INFO  org.cpswt.hla.FederationManager - Federation manager current time = 10.0
+09:11:45.683 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 10.0 and step = 1.0 and requested_time = 11.0
+09:11:46.685 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 11.0 and step = 1.0 and requested_time = 12.0
+09:11:47.687 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 12.0 and step = 1.0 and requested_time = 13.0
+09:11:48.691 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 13.0 and step = 1.0 and requested_time = 14.0
+09:11:49.695 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 14.0 and step = 1.0 and requested_time = 15.0
+09:11:50.700 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 15.0 and step = 1.0 and requested_time = 16.0
+09:11:51.701 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 16.0 and step = 1.0 and requested_time = 17.0
+09:11:52.704 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 17.0 and step = 1.0 and requested_time = 18.0
+09:11:53.707 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 18.0 and step = 1.0 and requested_time = 19.0
+09:11:54.711 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 19.0 and step = 1.0 and requested_time = 20.0
+09:11:54.715 [Thread-3] INFO  org.cpswt.hla.FederationManager - Federation manager current time = 20.0
+09:11:55.715 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 20.0 and step = 1.0 and requested_time = 21.0
+09:11:56.717 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 21.0 and step = 1.0 and requested_time = 22.0
+09:11:57.720 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 22.0 and step = 1.0 and requested_time = 23.0
+09:11:58.724 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 23.0 and step = 1.0 and requested_time = 24.0
+09:11:59.734 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 24.0 and step = 1.0 and requested_time = 25.0
+09:12:00.746 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 25.0 and step = 1.0 and requested_time = 26.0
+09:12:01.748 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 26.0 and step = 1.0 and requested_time = 27.0
+09:12:02.758 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 27.0 and step = 1.0 and requested_time = 28.0
+09:12:03.761 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 28.0 and step = 1.0 and requested_time = 29.0

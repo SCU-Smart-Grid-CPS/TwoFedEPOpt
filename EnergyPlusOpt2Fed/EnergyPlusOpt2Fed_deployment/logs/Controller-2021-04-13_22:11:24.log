@@ -1,0 +1,12 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+
+-------------------------------------------------------------------
+GMS: address=vagrant-63381, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:49118
+-------------------------------------------------------------------
+22:11:53.081 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToPopulate...
