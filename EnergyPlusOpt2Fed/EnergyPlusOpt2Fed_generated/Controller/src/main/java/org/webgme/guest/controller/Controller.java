@@ -40,6 +40,7 @@ public class Controller extends ControllerBase {
     double[] outTemps=new double[numSockets];
     double[] coolTemps= new double[numSockets]; 
     double[] heatTemps= new double[numSockets];
+    double[] heatTempFromOpt= new double[numSockets];
     double[] zoneTemps= new double[numSockets];
     double[] zoneRHs= new double[numSockets];
     double[] heatingEnergy= new double[numSockets];
@@ -78,6 +79,9 @@ public class Controller extends ControllerBase {
     String timestep_Reader = "";
     String timestep_Market = "";
     String timestep_Controller = "";
+
+    int fuzzy_heat = 0;  // NEEDS TO BE GLOBAL VAR outside of while loop
+    int fuzzy_cool = 0;  // NEEDS TO BE GLOBAL VAR outside of while loop
 
     // REMOVE NEXT TWO LINES!! this was for testing preloading weather
     // double[] outTemperature = new double[]{7.2,6.7,6.1,4.4,4.4,6.1,5,7.8,8.9,9.4,10,10.6,11.1,13.9,13.9,11.1,11.1,10.6,10.6,8.9,9.4,7.8,6.7,8.9,6.1,5.6,3.9,5.6,7.2,7.8,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10};
@@ -218,6 +222,8 @@ public class Controller extends ControllerBase {
             boolean startSavingO = false;
             boolean startSavingS = false;
 
+            // comment here to stop optimization process_______________________________________________________________________
+
             if (hour == 0){
                 day = day+1;
             }
@@ -274,6 +280,9 @@ public class Controller extends ControllerBase {
                         if (s .equals("solar radiation")){
                             startSavingS = true;
                         }
+                        // if (s .equals("Certificate of primal infeasibility found.")){
+                            
+                        // }
                         // System.out.println(dataString);
                     }
                 } catch (IOException e) {
@@ -284,12 +293,17 @@ public class Controller extends ControllerBase {
                 String varsP[] = dataStringOptP.split(separatorOpt);
                 String varsO[] = dataStringOptO.split(separatorOpt);
                 String varsS[] = dataStringOptS.split(separatorOpt);
+
+                for (int in =1;in<13;in++) {
+                    futureIndoorTemp[in-1]=varsT[in];
+                }
+
     
                 // Writing data to file
                 try{
                     // Create new file
                     
-                    String path="/home/vagrant/Desktop/Projects/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_generated/DataSummary.txt";
+                    String path="/home/vagrant/Desktop/Projects/TwoFedEPOpt/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataSummaryfromCVXOPT.txt";
                     File file = new File(path);
     
                     // If file doesn't exists, then create it
@@ -303,7 +317,6 @@ public class Controller extends ControllerBase {
                     // Write in file
                     for (int in =1;in<13;in++) {
                         bw.write(vars[in]+"\t"+varsT[in]+"\t"+varsP[in]+"\t"+varsO[in]+"\t"+varsS[in]+"\n");
-                        futureIndoorTemp[in-1]=varsT[in];
                     }
     
                     // Close connection
@@ -323,22 +336,98 @@ public class Controller extends ControllerBase {
             }
 
             // Setting setpoint temp for next hour 
-            System.out.println("determine setpoints loop");
+            System.out.println("determine setpoints loop1");
             if (hour%1 == 0){
                 p=0;
+                System.out.println("p"+String.valueOf(p));
             }
             heatTemps[0]=Double.parseDouble(futureIndoorTemp[p]);
+            heatTempFromOpt[0]=Double.parseDouble(futureIndoorTemp[p]);
+            System.out.println("heatTemp"+String.valueOf(heatTemps[0]));
             coolTemps[0]=30.2;
+            System.out.println("coolTemp: "+String.valueOf(coolTemps[0]));
             p=p+1;
+            System.out.println("p"+String.valueOf(p));
             
-        //   //-------------------------------------------------------------------------------------------------
-        //    // Now figure out all stuff that needs to be sent to socket...
+          //-------------------------------------------------------------------------------------------------
+          // Now figure out all stuff that needs to be sent to socket...
         
           // determine heating and cooling setpoints for each simID
           // will eventually change this part for transactive energy
-          System.out.println("determine setpoints loop");
+          System.out.println("determine setpoints loop2");
 
-          int Fuzzycool=0,Fuzzyheat=0;
+
+            // Fuzzy control
+            for(int i=0;i<numSockets;i++){
+                double max_cool_temp = 30.2; 
+                double min_heat_temp = 18.9; 
+                double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
+
+                // I think if we set these as a band 
+                heatTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])-0.5;
+                coolTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])+0.5;
+
+                // Determine minimum and maximum temperatures allowed (we can probably print this from optimization code too)
+                if (outTemps[i]<=10){
+                    min_heat_temp =18.9;
+                    max_cool_temp =22.9;
+                }else if (outTemps[i]>=33.5){
+                    min_heat_temp =26.2;
+                    max_cool_temp =30.2;
+                }else {
+                    min_heat_temp = 0.31*outTemps[i] + 17.8-2;
+                    max_cool_temp = 0.31*outTemps[i] + 17.8+2;
+                }
+
+                // Now set maximum cool and minimum heats:
+                if (coolTemps[i]>=max_cool_temp){
+                    coolTemps[i]=max_cool_temp;
+                    }
+                if (heatTemps[i]<=min_heat_temp){
+                    heatTemps[i]=min_heat_temp;
+                    }
+
+                // For Cooling 1 degree under Cooling setpoint:
+                if (zoneTemps[i] >= coolTemps[i]-.1){ // first check if going to exit maximum band
+                    fuzzy_cool = -1;
+                } else if (zoneTemps[i] <= coolTemps[i]-1.1){
+                    fuzzy_cool = 1;
+                }
+                coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
+                coolTemps[i] = 30.2; // do this for now to avoid turning on AC
+
+                // For Heating 1 degree under Heating setpoint:
+                if (zoneTemps[i] <= heatTemps[i]+.1){ // first check if going to exit minimum band
+                    fuzzy_heat = 1;
+                } else if (zoneTemps[i] >= heatTemps[i]+1.1){
+                    fuzzy_heat = -1;
+                }
+                heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
+            }   // _______________________________________________________________________
+
+        //   int Fuzzycool=0;
+        //   int Fuzzyheat=0;
+        //   // 0.5 degree fuzzy control (this oscillates indoor temp)
+        //   double offset=0.6;
+        //   if (zoneTemps[0]>=coolTemps[0]-0.5+offset){
+        //       Fuzzyheat = -1;
+        //       Fuzzycool = -1;
+        //   }else if (zoneTemps[0]>=coolTemps[0]-0.5-offset){
+        //       Fuzzyheat = -1;
+        //   }else if (zoneTemps[0]>=heatTemps[0]+0.5+offset){
+        //       Fuzzyheat = -1;
+        //       Fuzzycool = 1;
+        //   }else if (zoneTemps[0]>=heatTemps[0]-0.5-offset){
+        //       Fuzzycool = 1;
+        //   }else{
+        //       Fuzzyheat = 1;
+        //       Fuzzycool = 1;
+        //   }
+        //   coolTemps[0] = coolTemps[0] - 0.5 + Fuzzycool*offset;
+        //   heatTemps[0] = heatTemps[0] + 0.5 + Fuzzyheat*offset;
+
+          System.out.println("heatTemps[0] = "+heatTemps[0] );
+          System.out.println("coolTemps[0] = "+coolTemps[0] );
 
         //   // use the following loop to solve for heating/cooling setpts for each EnergyPlus simulation
         //   // if you only have one EnergyPlus simulation still use the loop so that it is easy to add more
@@ -349,18 +438,41 @@ public class Controller extends ControllerBase {
         //     System.out.println("zoneTemps[i] = "+ zoneTemps[i] );
         //     // zoneRHs[i] can add this but need to check FMU file and also edit socket.java
 
-        //     // Adaptive Setpoint Control:
-        //     if (outTemps[i]<=10){
-        //       heatTemps[i]=18.9;
-        //       coolTemps[i]=22.9;
-        //     }else if (outTemps[i]>=33.5){
-        //       heatTemps[i]=26.2;
-        //       coolTemps[i]=30.2;
-        //     }else {
-        //       heatTemps[i] = 0.31*outTemps[i] + 17.8-2;
-        //       coolTemps[i] = 0.31*outTemps[i] + 17.8+2;
-        //     }
-        //     // End Adaptive Setpoint Control
+            // // Adaptive Setpoint Control: _______________________________________________________________________
+            
+            // if (outTemps[0]<=10){
+            //   heatTemps[0]=18.9;
+            //   coolTemps[0]=22.9;
+            // }else if (outTemps[0]>=33.5){
+            //   heatTemps[0]=26.2;
+            //   coolTemps[0]=30.2;
+            // }else {
+            //   heatTemps[0] = 0.31*outTemps[0] + 17.8-2+0.5;
+            //   coolTemps[0] = 0.31*outTemps[0] + 17.8+2+0.5;
+            // }
+            // // End Adaptive Setpoint Control
+
+            //       // Fuzzy control
+            //       for(int i=0;i<numSockets;i++){
+            //         double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
+    
+            //         // For Cooling 1 degree under Cooling setpoint:
+            //         if (zoneTemps[i] >= coolTemps[i]-.1){
+            //         fuzzy_cool = -1;
+            //         } else if (zoneTemps[i] <= coolTemps[i]-1.1){
+            //             fuzzy_cool = +1;
+            //         }
+            //         coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
+                    
+                    
+            //         // For Heating 1 degree under Heating setpoint:
+            //         if (zoneTemps[i] >= heatTemps[i]+1.1){
+            //             fuzzy_heat = -1;
+            //         } else if (zoneTemps[i] <= heatTemps[i]+.1){
+            //             fuzzy_heat = +1;
+            //         }
+            //         heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
+            //     }   // _______________________________________________________________________
 
             // // 0.5 degree fuzzy control (this oscillates indoor temp)
             // double offset=0.6;
@@ -430,7 +542,7 @@ public class Controller extends ControllerBase {
             try{
                 // Create new file
                 
-                String path="/home/vagrant/Desktop/Projects/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataSummary.txt";
+                String path="/home/vagrant/Desktop/Projects/TwoFedEPOpt/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataSummaryfromEP.txt";
                 File file = new File(path);
 
                 // If file doesn't exists, then create it
@@ -442,7 +554,7 @@ public class Controller extends ControllerBase {
                 BufferedWriter bw = new BufferedWriter(fw);
 
                 // Write in file
-                bw.write(currentTime+"\t"+hour+"\t"+ zoneTemps[0]+"\t"+ outTemps[0]+"\t"+ solarRadiation[0]+"\t"+ heatingEnergy[0]+"\t"+ coolingEnergy[0] + "\t"+ receivedHeatTemp[0]+"\t"+ receivedCoolTemp[0]+"\t"+heatTemps[0]+"\t"+coolTemps[0]+"\n");
+                bw.write(currentTime+"\t"+hour+"\t"+ zoneTemps[0]+"\t"+ outTemps[0]+"\t"+ solarRadiation[0]+"\t" + receivedHeatTemp[0]+"\t"+ receivedCoolTemp[0]+"\t"+heatTempFromOpt[0]+"\t" +heatTemps[0]+"\t"+coolTemps[0]+"\n");
                
                 // Close connection
                 bw.close();

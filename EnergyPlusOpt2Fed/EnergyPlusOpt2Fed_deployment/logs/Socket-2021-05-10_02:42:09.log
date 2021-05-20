@@ -1,0 +1,13 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+
+-------------------------------------------------------------------
+GMS: address=vagrant-2515, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:44256
+-------------------------------------------------------------------
+02:42:49.839 [org.webgme.guest.socket.Socket.main()] INFO  org.webgme.guest.socket.Socket - create bufferedReader
+02:42:49.843 [org.webgme.guest.socket.Socket.main()] ERROR org.webgme.guest.socket.Socket - java.io.FileNotFoundException: /home/vagrant/Desktop/Projects/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_generated/config.txt (No such file or directory)

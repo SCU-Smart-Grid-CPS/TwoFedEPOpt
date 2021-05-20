@@ -1,0 +1,14 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+
+-------------------------------------------------------------------
+GMS: address=vagrant-30630, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:51113
+-------------------------------------------------------------------
+14:51:58.164 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToPopulate...
+WARN  [VERIFY_SUSPECT.TimerThread,EnergyPlusOpt2Fed1,vagrant-30630] portico.lrc.jgroups: Detected that federate [FederationManager-00f9e73f-92ad-410e-a61c-0ea86e01b106] may have crashed, investigating...
+WARN  [Regular] portico.lrc.jgroups: Federate [FederationManager-00f9e73f-92ad-410e-a61c-0ea86e01b106] has crashed. Sending fake resignation because it was too rude to.

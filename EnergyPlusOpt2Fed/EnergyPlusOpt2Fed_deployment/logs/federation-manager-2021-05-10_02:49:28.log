@@ -1,0 +1,27 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.5.0:java (default-cli) @ EnergyPlusOpt2Fed_exec ---
+02:49:34.141 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA definitions were provided!
+02:49:34.149 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA selections were provided!
+02:49:34.149 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No specific COA-selection was specified for execution!
+02:49:34.150 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COAs are used in this experiment.
+
+-------------------------------------------------------------------
+GMS: address=vagrant-15083, cluster=EnergyPlusOpt2Fed1, physical address=172.16.119.10:58719
+-------------------------------------------------------------------
+02:49:44.582 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.host.FederationManagerHostApp - Server online at 0.0.0.0:8083 ...
+02:50:29.312 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 0.0 and step = 1.0 and requested_time = 1.0
+WARN  [VERIFY_SUSPECT.TimerThread,EnergyPlusOpt2Fed1,vagrant-15083] portico.lrc.jgroups: Detected that federate [Controller-ef2367b2-d1c0-4b1d-b85a-a7cf7e9add5f] may have crashed, investigating...
+WARN  [Regular] portico.lrc.jgroups: Federate [Controller-ef2367b2-d1c0-4b1d-b85a-a7cf7e9add5f] has crashed. Sending fake resignation because it was too rude to.
+WARN  [VERIFY_SUSPECT.TimerThread,EnergyPlusOpt2Fed1,vagrant-15083] portico.lrc.jgroups: Detected that federate [Socket-a1d91106-d73d-4b4d-8005-9f22d6e068a9] may have crashed, investigating...
+WARN  [Regular] portico.lrc.jgroups: Federate [Socket-a1d91106-d73d-4b4d-8005-9f22d6e068a9] has crashed. Sending fake resignation because it was too rude to.
+WARN  [Regular] portico.lrc.jgroups: Unknown channel member crashed. Don't think it was a federate. Ignoring. uuid=ff19e719-e2df-4e69-a18d-5b77c2d29859
+02:51:18.642 [Thread-3] INFO  org.cpswt.hla.FederationManager - Current_time = 1.0 and step = 1.0 and requested_time = 2.0
+02:51:18.646 [Thread-3] INFO  org.cpswt.hla.FederationManager - Waiting for "Socket-a1d91106-d73d-4b4d-8005-9f22d6e068a9" federate to resign ...
+02:51:18.648 [Thread-3] INFO  org.cpswt.hla.FederationManager - Waiting for "ReadyToResign" ... 
+02:51:18.909 [Thread-3] INFO  org.cpswt.hla.FederationManager - Done with resign
+02:51:23.645 [Thread-4] INFO  org.cpswt.hla.FederationManager - Simulation terminated
