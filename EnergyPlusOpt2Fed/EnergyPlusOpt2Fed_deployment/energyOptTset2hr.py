@@ -30,10 +30,10 @@ occupancy_mode = False
 # When to run - CHECK IT MATCHES EP!
 # Options: Jan1thru7 Feb12thru19 Sept27thruOct3 July1thru7
 # Make sure to put in single quotes
-date_range = 'July1thru7' 
+date_range = 'Jan1thru7' 
 
 # SET HEATING VS COOLING!
-heatorcool = 'cool' # 'heat'
+heatorcool = 'heat' # 'cool'
 
 # Max and min for fixed setpoint control in C
 comfortZone_upper = 23.0
