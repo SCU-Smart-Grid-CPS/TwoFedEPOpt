@@ -5,6 +5,7 @@ Last Updated:	2021-06-23
 Notes:		Code for the optimization simulations. Changed to use /* comment style to be easier to activate/deactivate
 		parts of the code. Cleaned up organization.
 Run:		Need to change file paths in this code. Then build or build-all. Run as part of federation.
+Currently set to fixed setpoint, no optimization.
 */
 
 package org.webgme.guest.controller;
@@ -234,7 +235,7 @@ public class Controller extends ControllerBase {
             boolean startSavingS = false;
 
 // OPTIMIZATION
-/*     
+     
 // comment here to stop optimization process in Fixed wo Opt and Adaptive wo Opt
 	//_______________________________________________________________________
 
@@ -256,7 +257,7 @@ public class Controller extends ControllerBase {
                      System.out.println("zonetemp string" +String.valueOf(zoneTemps[0]));
 
                      // Process p = Runtime.getRuntime().exec("python ./energyOpt.py " +sday +" "+sblock +" "+ String.valueOf(zoneTemps[0])); // 4 hr block method
-                     Process p = Runtime.getRuntime().exec("python ./energyOptTset2hr.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])); // 1 timestep method
+                     Process p = Runtime.getRuntime().exec("python3 ./energyOptTset2hr.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])); // 1 timestep method
 
     
                      BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -417,7 +418,7 @@ public class Controller extends ControllerBase {
                      fuzzy_cool = 1;
                  }
                  coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
-                 // coolTemps[i] = 30.2; // do this for now to avoid turning on AC
+                 coolTemps[i] = 30.2; // UNCOMMENT IF HEATING for now to avoid turning on AC
 
                  // For Heating 1 degree under Heating setpoint:
                  if (zoneTemps[i] <= heatTemps[i]+.1){ // first check if going to exit minimum band
@@ -426,10 +427,10 @@ public class Controller extends ControllerBase {
                      fuzzy_heat = -1;
                  }
                  heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
-                 heatTemps[i] = 15.0; // do this for now to avoid turning on heat
+//                 heatTemps[i] = 15.0; // UNCOMMENT IF COOLING for now to avoid turning on heat
              }   // _______________________________________________________________________ 
 //END COMMENT FOR NO OPT
-*/        
+       
         
 /*        // Some kind of fuzzy control probably for optimization version or an older one -- brian
 	//comment out if unused
@@ -476,7 +477,7 @@ public class Controller extends ControllerBase {
             // Sets to a the minimum of 18.9 when outdoor temp outTemps < 10C, and max 30.2C when outTemps >= 33.5
             // Uses sliding scale for 10 < outTemps < 33.5 C
             // Note if temperature is consistently above 33.5C or below 10C no changes in setpoint will occur.
-            
+ /*           
             if (outTemps[0]<=10){
               heatTemps[0]=18.9;
               coolTemps[0]=22.9;
@@ -489,19 +490,19 @@ public class Controller extends ControllerBase {
             }
 
 	//COMMENT OUT coolTemps if cooling OR heatTemps if heating. Do NOT remove both!
-//             coolTemps[0]= 30.2;     // 23.0
-             heatTemps[0] = 15.0;   // 20.0 
-            
+             coolTemps[0]= 30.2;     // 23.0
+//             heatTemps[0] = 15.0;   // 20.0 
+ */           
 // End Adaptive Setpoint Control __________________________________________________________
 
 // FIXED SETPOINT
-/*	//COMMENT OUT if NOT fixed!
-             coolTemps[0]= 23.0;
-             heatTemps[0] = 15.0; 
-*/   //END FIXED SETPT
+	//COMMENT OUT if NOT fixed!
+             coolTemps[0]= 30.2; //23.0 if cooling, 30.2 if not
+             heatTemps[0] = 20.0; //20.0 if heating, 15.0 if not
+   //END FIXED SETPT
 
 /*
-            // Fuzzy control old? ______________________________________________________________
+// Unknown - old fuzzy? ______________________________________________________________
                   for(int i=0;i<numSockets;i++){
                      double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
     
@@ -521,11 +522,13 @@ public class Controller extends ControllerBase {
                          fuzzy_heat = +1;
                      }
                      heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
-                 }   // _______________________________________________________________________
+                 }   
+// _______________________________________________________________________
 */
 
 //FUZZY CONTROL FOR NO OPTIMIZATION
 // COMMENT OUT IF USING OPTIMIZATION
+/*
             // Fuzzy control added for testing 5/16 without optimization
             for(int i=0;i<numSockets;i++){
               double max_cool_temp = 30.2; 
@@ -563,7 +566,7 @@ public class Controller extends ControllerBase {
                   fuzzy_cool = 1;
               }
               coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
-              // coolTemps[i] = 30.2; // Override for now to avoid turning on AC. COMMENT OUT IF COOLING!
+              coolTemps[i] = 30.2; // Override for now to avoid turning on AC. COMMENT OUT IF COOLING!
 
               // For Heating 1 degree under Heating setpoint:
               if (zoneTemps[i] <= heatTemps[i]+.1){ // first check if going to exit minimum band
@@ -572,8 +575,9 @@ public class Controller extends ControllerBase {
                   fuzzy_heat = -1;
               }
               heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
-              heatTemps[i] = 15.0; // Override for now to avoid turning on heat. COMMENT OUT IF HEATING!
+//              heatTemps[i] = 15.0; // Override for now to avoid turning on heat. COMMENT OUT IF HEATING!
           }
+          */
 // END FUZZY NO OPT
 
           // Send values to each socket federate
