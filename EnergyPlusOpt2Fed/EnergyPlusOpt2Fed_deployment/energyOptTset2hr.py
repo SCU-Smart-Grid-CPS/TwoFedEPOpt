@@ -1,4 +1,8 @@
-# Add commenting
+# energyOptTset2hr.py
+# Author(s):    PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
+# Last Updated: 2021-06-23
+# Changelog:
+# - Added switching for adaptive vs fixed control via adaptive_comfort - Brian
 
 # To do:
 # remove heatorcool
@@ -6,7 +10,6 @@
 # mode: Adaptive vs fixed
 # send both heating and cooling setpoints
 # ensure timing is right
-
 
 
 # import packages 
@@ -21,13 +24,18 @@ timestep = 5*60 # number of seconds per timestep
 n=24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window)
 pricingmultfactor = 4.0
 pricingoffset = 0.10
-adaptive_comfort = False
+adaptive_comfort = False #false if using fixed, true if adaptive - MATCH
 occupancy_mode = False
-date_range = 'Jan1thru7'   #'July1thru7' Jan1thru7 Feb12thru19 Sept27thruOct3 July1thru7
 
-heatorcool = 'cool'
+# When to run - CHECK IT MATCHES EP!
+# Options: Jan1thru7 Feb12thru19 Sept27thruOct3 July1thru7
+# Make sure to put in single quotes
+date_range = 'July1thru7' 
 
-# Max and min for fixed setpoint control
+# SET HEATING VS COOLING!
+heatorcool = 'cool' # 'heat'
+
+# Max and min for fixed setpoint control in C
 comfortZone_upper = 23.0
 comfortZone_lower = 20.0
 # Max and min for heating and cooling in adaptive setpoint control
@@ -83,7 +91,7 @@ df = pd.read_excel('Solar.xlsx', sheet_name=date_range)
 q_solar_all=matrix(df.to_numpy())
 
 # get wholesale prices
-df = pd.read_excel('WholesalePrice.xlsx', sheet_name='Feb12thru19')  # CHANGE TO MATCH CURRENT SIM!  # 'Jan1thru7'
+df = pd.read_excel('WholesalePrice.xlsx', sheet_name='Feb12thru19')
 wholesaleprice_all=matrix(df.to_numpy())
 
 # setting up optimization to minimize energy times price
@@ -167,17 +175,18 @@ if occupancy_mode == True:
 			b[2*k+1,0]=-noOccupancyHeat+S[k,0]
 		k=k+1
 else:
-	k = 0
-	while k<n:
-		b[2*k,0]=adaptiveCool[k,0]-S[k,0]
-		b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
-		k=k+1
-# else:
-# 	k = 0
-# 	while k<n:
-# 		b[2*k,0]=comfortZone_upper-S[k,0]
-# 		b[2*k+1,0]=-comfortZone_lower+S[k,0]
-# 		k=k+1
+	if adaptive_comfort: #If Adaptive, use this part
+        k = 0
+        while k<n:
+            b[2*k,0]=adaptiveCool[k,0]-S[k,0]
+            b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
+            k=k+1
+    else: # If Fixed, use this part
+        k = 0
+        while k<n:
+            b[2*k,0]=comfortZone_upper-S[k,0]
+            b[2*k+1,0]=-comfortZone_lower+S[k,0]
+            k=k+1
 
 # time to solve for energy at each timestep
 #print(cc)
@@ -221,14 +230,14 @@ if x.value == None:
 		# 	p = p+1
 		temp_indoor = matrix(0.0, (13,1))
 		while j<13:
-			if heatorcool == 'cool':
+			if heatorcool == 'cool' and adaptive_comfort: # Cooling, adaptive
 				temp_indoor[j]=adaptiveCool[j,0]
-			else:
+			else if adaptive_comfort: # Heating adaptive
 				temp_indoor[j]=adaptiveHeat[j,0]
-			# if heatorcool == 'cool':
-			# 	temp_indoor[j]=comfortZone_upper
-			# else:
-			# 	temp_indoor[j]=comfortZone_lower
+			else if heatorcool == 'cool': # Cooling, fixed
+                temp_indoor[j]=comfortZone_upper
+			else: # Heating, fixed
+			 	temp_indoor[j]=comfortZone_lower
 			j=j+1
 		print('indoor temp prediction')
 		j = 0
