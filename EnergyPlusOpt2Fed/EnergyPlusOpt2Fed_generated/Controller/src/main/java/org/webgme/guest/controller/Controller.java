@@ -5,7 +5,7 @@ Last Updated:	2021-06-23
 Notes:		Code for the optimization simulations. Changed to use /* comment style to be easier to activate/deactivate
 		parts of the code. Cleaned up organization.
 Run:		Need to change file paths in this code. Then build or build-all. Run as part of federation.
-Currently set to fixed setpoint, no optimization.
+Currently set to fixed setpoint with optimization.
 */
 
 package org.webgme.guest.controller;
