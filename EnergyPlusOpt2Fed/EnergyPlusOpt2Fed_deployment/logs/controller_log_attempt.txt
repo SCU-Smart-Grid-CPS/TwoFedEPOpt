@@ -1,0 +1,109 @@
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/usr/share/maven/lib/guice.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------< [0;36morg.webgme.guest:EnergyPlusOpt2Fed_exec[0;1m >---------------[m
+[[1;34mINFO[m] [1mBuilding EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mexec-maven-plugin:1.5.0:java[m [1m(default-cli)[m @ [36mEnergyPlusOpt2Fed_exec[0;1m ---[m
+
+-------------------------------------------------------------------
+GMS: address=vagrant-virtual-machine-57427, cluster=EnergyPlusOpt2Fed1, physical address=10.16.130.151:40219
+-------------------------------------------------------------------
+15:46:48.869 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToPopulate...
+15:48:53.882 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - ...synchronized on readyToPopulate
+15:48:53.883 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting on readyToRun...
+15:48:54.134 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - ...synchronized on readyToRun
+15:48:54.135 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - started logical time progression
+timestep before receiving Socket/Reader: 0.0
+15:48:54.137 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - timestep before receiving Socket/Reader: 
+15:48:54.137 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+15:48:54.242 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - waiting to receive Socket_Controller interaction...
+15:48:54.244 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - received RCModel_Controller interaction
+numVars[simID] = 0
+holder[simID] = epSendNetEnergy@242938.562500,epSendZoneMeanAirTemp@20.000006,epSendOutdoorAirTemp@6.791667,epSendZoneHumidity@37.496002,epSendEnergyPurchased@242938.562500,epSendEnergySurplus@0.000000,epSendSolarRadiation@0.000000,epSendHeatingSetpoint@20.000000,epSendCoolingSetpoint@23.000000,timestep@0.0,
+handle interaction loop
+vars[0] = epSendNetEnergy@242938.562500
+length of vars = 10
+j = 0
+token = epSendNetEnergy@242938.562500
+token1[0] = epSendNetEnergy
+token1[1] = 242938.562500
+varNames[j] = epSendNetEnergy
+doubles[j] = 242938.562500
+j = 1
+token = epSendZoneMeanAirTemp@20.000006
+token1[0] = epSendZoneMeanAirTemp
+token1[1] = 20.000006
+varNames[j] = epSendZoneMeanAirTemp
+doubles[j] = 20.000006
+j = 2
+token = epSendOutdoorAirTemp@6.791667
+token1[0] = epSendOutdoorAirTemp
+token1[1] = 6.791667
+varNames[j] = epSendOutdoorAirTemp
+doubles[j] = 6.791667
+j = 3
+token = epSendZoneHumidity@37.496002
+token1[0] = epSendZoneHumidity
+token1[1] = 37.496002
+varNames[j] = epSendZoneHumidity
+doubles[j] = 37.496002
+j = 4
+token = epSendEnergyPurchased@242938.562500
+token1[0] = epSendEnergyPurchased
+token1[1] = 242938.562500
+varNames[j] = epSendEnergyPurchased
+doubles[j] = 242938.562500
+j = 5
+token = epSendEnergySurplus@0.000000
+token1[0] = epSendEnergySurplus
+token1[1] = 0.000000
+varNames[j] = epSendEnergySurplus
+doubles[j] = 0.000000
+j = 6
+token = epSendSolarRadiation@0.000000
+token1[0] = epSendSolarRadiation
+token1[1] = 0.000000
+varNames[j] = epSendSolarRadiation
+doubles[j] = 0.000000
+j = 7
+token = epSendHeatingSetpoint@20.000000
+token1[0] = epSendHeatingSetpoint
+token1[1] = 20.000000
+varNames[j] = epSendHeatingSetpoint
+doubles[j] = 20.000000
+j = 8
+token = epSendCoolingSetpoint@23.000000
+token1[0] = epSendCoolingSetpoint
+token1[1] = 23.000000
+varNames[j] = epSendCoolingSetpoint
+doubles[j] = 23.000000
+j = 9
+token = timestep@0.0
+token1[0] = timestep
+token1[1] = 0.0
+varNames[j] = timestep
+doubles[j] = 0.0
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+i = 7
+i = 8
+i = 9
+timestep after receiving Socket/Reader and before sending to Market: 0.0
+15:48:54.272 [org.webgme.guest.controller.Controller.main()] INFO  org.webgme.guest.controller.Controller - hour is: 
+hour is:0.0
+sblock:0
+sday:1
+zonetemp string20.000006
+Here is the result
+15:48:54.502 [org.webgme.guest.controller.Controller.main()] ERROR org.webgme.guest.controller.Controller - java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1
