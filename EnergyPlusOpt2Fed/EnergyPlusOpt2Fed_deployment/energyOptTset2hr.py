@@ -24,15 +24,15 @@ timestep = 5*60 # number of seconds per timestep
 n=24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window)
 pricingmultfactor = 4.0
 pricingoffset = 0.10
-adaptive_comfort = False #false if using fixed, true if adaptive - MATCH
+adaptive_comfort = True #false if using fixed, true if adaptive - CHECK ME! IMPORTANT!!!
 occupancy_mode = False
 
-# When to run - CHECK IT MATCHES EP!
+# When to run - CHECK IT MATCHES EP!!!
 # Options: Jan1thru7 Feb12thru19 Sept27thruOct3 July1thru7
 # Make sure to put in single quotes
 date_range = 'Jan1thru7' 
 
-# SET HEATING VS COOLING!
+# SET HEATING VS COOLING! - CHECK! IMPORTANT!!!
 heatorcool = 'heat' # 'cool'
 
 # Max and min for fixed setpoint control in C
@@ -176,17 +176,17 @@ if occupancy_mode == True:
 		k=k+1
 else:
 	if adaptive_comfort: #If Adaptive, use this part
-        k = 0
-        while k<n:
-            b[2*k,0]=adaptiveCool[k,0]-S[k,0]
-            b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
-            k=k+1
-    else: # If Fixed, use this part
-        k = 0
-        while k<n:
-            b[2*k,0]=comfortZone_upper-S[k,0]
-            b[2*k+1,0]=-comfortZone_lower+S[k,0]
-            k=k+1
+		k = 0
+		while k<n:
+			b[2*k,0]=adaptiveCool[k,0]-S[k,0]
+			b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
+			k=k+1
+	else: # If Fixed, use this part
+		k = 0
+		while k<n:
+			b[2*k,0]=comfortZone_upper-S[k,0]
+			b[2*k+1,0]=-comfortZone_lower+S[k,0]
+			k=k+1
 
 # time to solve for energy at each timestep
 #print(cc)
@@ -232,10 +232,10 @@ if x.value == None:
 		while j<13:
 			if heatorcool == 'cool' and adaptive_comfort: # Cooling, adaptive
 				temp_indoor[j]=adaptiveCool[j,0]
-			else if adaptive_comfort: # Heating adaptive
+			elif adaptive_comfort: # Heating adaptive
 				temp_indoor[j]=adaptiveHeat[j,0]
-			else if heatorcool == 'cool': # Cooling, fixed
-                temp_indoor[j]=comfortZone_upper
+			elif heatorcool == 'cool': # Cooling, fixed
+                		temp_indoor[j]=comfortZone_upper
 			else: # Heating, fixed
 			 	temp_indoor[j]=comfortZone_lower
 			j=j+1
