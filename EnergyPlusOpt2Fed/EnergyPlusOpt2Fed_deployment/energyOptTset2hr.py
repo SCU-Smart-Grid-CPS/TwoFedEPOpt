@@ -91,7 +91,7 @@ df = pd.read_excel('Solar.xlsx', sheet_name=date_range)
 q_solar_all=matrix(df.to_numpy())
 
 # get wholesale prices
-df = pd.read_excel('WholesalePrice.xlsx', sheet_name='Feb12thru19')
+df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range) #changed so no longer need to retype string, just change variable above.
 wholesaleprice_all=matrix(df.to_numpy())
 
 # setting up optimization to minimize energy times price
