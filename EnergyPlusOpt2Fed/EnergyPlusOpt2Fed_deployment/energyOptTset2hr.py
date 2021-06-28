@@ -1,6 +1,6 @@
 # energyOptTset2hr.py
 # Author(s):    PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-# Last Updated: 2021-06-23
+# Last Updated: 2021-06-28
 # Changelog:
 # - Added switching for adaptive vs fixed control via adaptive_comfort - Brian
 
@@ -95,19 +95,19 @@ df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range) #changed so no 
 wholesaleprice_all=matrix(df.to_numpy())
 
 # setting up optimization to minimize energy times price
-x=variable(n)	# x is energy usage that we are predicting
+x=variable(n)	# x is energy usage that we are predicting (Same as E_used on PJs thesis, page 26)
 
-# A matrix is coefficients of energy used variables in constraint equations (see PJs equations)
+# AA matrix is coefficients of energy used variables in constraint equations (same as D in PJs thesis, page 26)
 AA = matrix(0.0, (n*2,n))
 k = 0
 while k<n:
-	j = 2*k
-	AA[j,k] = timestep*c2
+	j = 2*k #This solves dt*C_2 (PJ eq 2.14)
+	AA[j,k] = timestep*c2 
 	AA[j+1,k] = -timestep*c2
 	k=k+1
 k=0
 while k<n:
-	j=2*k+2
+	j=2*k+2 #Solve C_1 part. row_above * timestep * c1 * 
 	while j<2*n-1:
 		AA[j,k] = AA[j-2,k]*-timestep*c1+ AA[j-2,k]
 		AA[j+1,k] = AA[j-1,k]*-timestep*c1+ AA[j-1,k]
@@ -117,13 +117,13 @@ while k<n:
 # making sure energy is positive for heating
 heat_positive = matrix(0.0, (n,n))
 i = 0
-while i<n:
+while i<n: #Heat is a diagonal matrix with ones on diagonal; entire matrix equals 0
 	heat_positive[i,i] = -1.0 # setting boundary condition: Energy used at each timestep must be greater than 0
 	i +=1
 # making sure energy is negative for cooling
 cool_negative = matrix(0.0, (n,n))
 i = 0
-while i<n:
+while i<n: #cool is a diagonal matrix with -1 on diagonal; entire matrix equals 0
 	cool_negative[i,i] = 1.0 # setting boundary condition: Energy used at each timestep must be less than 0
 	i +=1
 
@@ -135,18 +135,18 @@ energyLimit = matrix(0.25, (n,1)) # .4, 0.25 before
 heatlimiteq = (cool_negative*x<=energyLimit)
 coollimiteq = (heat_positive*x<=0.1)
 
-# creating S matrix to make b matrix simpler
-temp_outdoor= temp_outdoor_all[(hour-1)*12:(hour-1)*12+n,0] # getting next two hours of data
-q_solar=q_solar_all[(hour-1)*12:(hour-1)*12+n,0]
+# creating S matrix (See PJ thesis pg 27 and eq 2.17 & 2.18) to make b matrix simpler
+temp_outdoor= temp_outdoor_all[(hour-1)*12:(hour-1)*12+n,0] # get next two hours of outside temp data
+q_solar=q_solar_all[(hour-1)*12:(hour-1)*12+n,0]  # get solar irradiation data
 
 # get price for next two hours
 cc=wholesaleprice_all[(hour-1)*12:(hour-1)*12+n,0]*pricingmultfactor/1000+pricingoffset
 # cc = c[(hour-1)*12:(hour-1)*12+n,0]
 S = matrix(0.0, (n,1))
-S[0,0] = timestep*(c1*(temp_outdoor[0]-temp_indoor_initial)+c3*q_solar[0])+temp_indoor_initial
+S[0,0] = timestep*(c1*(temp_outdoor[0]-temp_indoor_initial)+c3*q_solar[0])+temp_indoor_initial  #First row S matrix
 
 i=1
-while i<n:
+while i<n:  #Loop to solve all S^(n) for n > 1
 	S[i,0] = timestep*(c1*(temp_outdoor[i]-S[i-1,0])+c3*q_solar[i])+S[i-1,0]
 	i+=1
 #print(S)
@@ -192,18 +192,18 @@ else:
 #print(cc)
 #print(AA)
 #print(b)
-ineq = (AA*x <= b)
-if heatorcool == 'heat':
+ineq = (AA*x <= b)  #Solve comfort zone inequalities 
+if heatorcool == 'heat': # PJ eq 2.8; T^(n)_indoor >= T^(n)_comfort,lower
 	lp2 = op(dot(cc,x),ineq)
 	op.addconstraint(lp2, heatineq)
 	op.addconstraint(lp2,heatlimiteq)
-if heatorcool == 'cool':
+if heatorcool == 'cool': # PJ eq 2.9; T^(n)_indoor =< T^(n)_comfort,lower
 	lp2 = op(dot(-cc,x),ineq)
 	op.addconstraint(lp2, coolineq)
 	op.addconstraint(lp2,coollimiteq)
-lp2.solve()
+lp2.solve()  #Tells CVXOPT to solve the problem
 
-# If primal infeasibility is found (optimization cannot be done within constriants), set the energy usage to 0 and the predicted indoor temperature to the comfort region bound.
+# If primal infeasibility is found (initial temperature is outside of comfort zone, so optimization cannot be done within constriants), set the energy usage to 0 and the predicted indoor temperature to the comfort region bound.
 if x.value == None:
 	# if heatorcool == 'heat':
 	# 	lp2 = op(dot(-cc,x),ineq)
@@ -215,7 +215,7 @@ if x.value == None:
 	# 	op.addconstraint(lp2, heatlimiteq)
 	# lp2.solve()
 	if x.value == None:
-		energy = matrix(0.00, (13,1))
+		energy = matrix(0.00, (13,1)) #Energy is only used by CVXOPT so set = 0 to avoid confusion
 		print('energy consumption')
 		j=0
 		while j<13:
@@ -239,7 +239,7 @@ if x.value == None:
 			else: # Heating, fixed
 			 	temp_indoor[j]=comfortZone_lower
 			j=j+1
-		print('indoor temp prediction')
+		print('indoor temp prediction') # Print output is read by Controller.java. Expect to send 12 of each value
 		j = 0
 		while j<13:
 			print(temp_indoor[j,0])
@@ -271,8 +271,8 @@ if x.value == None:
 		while j<12:
 			print(adaptiveCool[j,0])
 			j=j+1
-		quit()
-
+		quit()  #Exit this program
+# Otherwise it worked correctly, do the stuff below here.
 energy = x.value
 # print('energy value found')
 
@@ -283,7 +283,7 @@ p = 1
 while p<n:
 	temp_indoor[p,0] = timestep*(c1*(temp_outdoor[p-1,0]-temp_indoor[p-1,0])+c2*energy[p-1,0]+c3*q_solar[p-1,0])+temp_indoor[p-1,0]
 	p = p+1
-# print('indoor temp calculated 1')
+# Problem: if the indoor temperature prediction overestimates the amount of natural heating in heat setting, or natural cooling in cool setting, the optimization results in zero energy consumption. But since we make the setpoints equal to the estimate, EP may not have that natural change, and instead need to run HVAC unnecessarily. Since the optimizer doesn't expect HVAC to run when the energy usage = 0, make the setpoints = comfort zone bounds to prevent this.
 p=1
 while p<n:
 	if heatorcool == 'cool':
@@ -297,7 +297,7 @@ while p<n:
 			temp_indoor[p]=adaptiveHeat[p,0]
 	p = p+1
 		# print('indoor temp adjusted' p)
-
+# Print output is read by Controller.java. Expect to send 12 of each value
 print('energy consumption')
 j=0
 while j<13:
