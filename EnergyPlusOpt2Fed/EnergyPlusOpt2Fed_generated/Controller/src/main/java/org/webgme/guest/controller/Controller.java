@@ -1,13 +1,15 @@
 /*
 File:		controller.java
 Author(s):	PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-Last Updated:	2021-06-24
+Last Updated:	2021-06-30
 Notes:		Code for the optimization simulations. Changed to use /* comment style to be easier to activate/deactivate
 		parts of the code. Cleaned up organization.
 Run:		Change file paths in this code. Then build or build-all. Run as part of federation.
 For Optimization both Fixed and Adaptive, UNcomment the big optimization section, and COMMENT all other fixed and adaptive sections
 UPDATE:	No need to comment or uncomment anymore - Instead change booleans optimizeSet and adaptiveSet around line 48
 		old commenting instructions kept because it has not been tested with every combination yet and it might be buggy
+		No more long filepaths to change! Instead it saves to the run directory (usually deployment) by default!
+		EP and CVXOPT Data Summary file paths have a date + time format so they don't overwrite previous runs.
 */
 
 package org.webgme.guest.controller;
@@ -31,6 +33,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Random;    // random num generator
 import java.lang.*;
+// Added for nice filenames
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 // Define the Controller type of federate for the federation.
 
@@ -99,6 +104,11 @@ public class Controller extends ControllerBase {
 
     int fuzzy_heat = 0;  // NEEDS TO BE GLOBAL VAR outside of while loop
     int fuzzy_cool = 0;  // NEEDS TO BE GLOBAL VAR outside of while loop
+    
+    //Get date + time string for output file naming.
+    // Need to do this here because otherwise the date time string might change during the simulation
+    String datime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
+    
 
     // REMOVE NEXT TWO LINES!! this was for testing preloading weather
     // double[] outTemperature = new double[]{7.2,6.7,6.1,4.4,4.4,6.1,5,7.8,8.9,9.4,10,10.6,11.1,13.9,13.9,11.1,11.1,10.6,10.6,8.9,9.4,7.8,6.7,8.9,6.1,5.6,3.9,5.6,7.2,7.8,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10};
@@ -356,8 +366,12 @@ public class Controller extends ControllerBase {
                  try{
                      // Create new file
                     
-                     String path="/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataSummaryfromCVXOPT.txt";
-                     File file = new File(path);
+                     //String path="/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataCVXOPT_" + datime +".txt";
+                     //File file = new File(path);
+                     
+                     // New file naming method that goes to Deployment folder and has the time and date string - Brian
+                     // DataCVXOPT_YYYY-MM-DD_HH-mm.txt
+                     File file = new File("DataCVXOPT_"+datime+".txt");
     
                      // If file doesn't exists, then create it
                      if (!file.exists()) {
@@ -666,10 +680,14 @@ public class Controller extends ControllerBase {
 
             // Writing data to file
             try{
-                // Create new file ---------------------------------- CHANGE PATH ON NEW COMPUTER!
+                // Create new file ---------------------------------- CHANGE PATH ON NEW COMPUTER! (not needed anymore)
                 
-                String path="/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataSummaryfromEP.txt";
-                File file = new File(path);
+                //String path="/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataEP_"+datime+".txt";
+                //File file = new File(path);
+                
+                // New file naming method that goes to Deployment folder and has the time and date string - Brian
+                // DataEP_YYYY-MM-DD_HH-mm.txt
+                File file = new File("DataEP_"+datime+".txt");
 
                 // If file doesn't exists, then create it
                 if (!file.exists()) {
