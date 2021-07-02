@@ -1,5 +1,5 @@
-#Energy Plus San Francisco House Model
-For optimization with a single house in EP and the EnergyPlusOpt2Fed federation in UCEF.
+# Energy Plus San Francisco House Model
+For optimization with a single house in EP and the EnergyPlusOpt2Fed or the EPMultipleSims_v4 federation in UCEF.
 
 Tested to work on the cluster, with EP 9-4-0 and UCEF 1.1.0
 
