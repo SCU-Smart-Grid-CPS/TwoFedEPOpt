@@ -7,7 +7,7 @@
 # - Added occupancy optimization - Brian
 # - Fixed optimizer should not know occupancy status beyond current time
 # - Merging 2 codes, keeping the best characteristics of each
-# - Base code is energyOptTset2hr_kaleb.py, with stuff from the PJ/Brian one added when useful
+# - Base code is energyOptTset2hr_kaleb.py, with stuff from the PJ/Brian one added
 # - Runtime reduced from 2.0 +/- 0.5s to 1.0 +/- 0.5s by moving mode-specific steps inside "if" statements
 #   and taking dataframe subsets before transformation to matrices
 # Usage:
@@ -26,7 +26,6 @@ import numpy as np
 import sys
 import datetime as datetime
 from scipy.stats import norm
-#start_time=time.process_time()
 
 # IMPORTANT PARAMETERS TO CHANGE ----------------------------------------------
 
@@ -58,7 +57,7 @@ heatorcool = 'cool'
 #   'adaptive90': optimization with adaptive setpoints where 90% people are comfortable. No occupancy
 #   'fixed': optimization with fixed setpoints. No occupany.
 #   'occupancy_precognition': Optimize if occupancy status for entire prediction period (2 hrs into future) is known. A joke!?
-MODE = 'occupancy'
+MODE = 'adaptive90'
 
 # ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
@@ -80,7 +79,7 @@ n= 24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2
 nt = 14 # Number of effective predicted timesteps
 n_occ = 12 # number of timesteps for which occupancy data is considered known (12 = first hour for hourly occupancy data)
 timestep = 5*60
-# No longer used but kept for potential future use.
+# No longer used but kept for potential future use:
 #days = 7
 #totaltimesteps = days*12*24+3*12
 
@@ -96,6 +95,7 @@ PRICING_OFFSET = 0.10
 #   day = [int] day number in simulation. 1 =< day =< [Number of days in simulation]
 #   hour = [int] hour of the day. 12am = 0, 12pm = 11, 11pm = 23
 #   temp_indoor_initial = [float] the initial indoor temperature in °C
+#   nt = number of 5 minute timesteps to return prediction for.
 day = int(sys.argv[1])
 block = int(sys.argv[2]) +1+(day-1)*24 # block goes 0:23 (represents the hour within a day)
 temp_indoor_initial = float(sys.argv[3])
@@ -114,7 +114,6 @@ c3 = 3.58*10**-7
 # Get outdoor temps [°C]
 if temp_data_interval == 5: # 5 minutes can use directly
     outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range,header=0)
-    #temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
     outdoor_temp_df.columns = ['column1']
     temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy()) #new
 elif temp_data_interval == 60: #  for hourly data
@@ -122,7 +121,7 @@ elif temp_data_interval == 60: #  for hourly data
     start_date = datetime.datetime(2021,2,12)
     dates = np.array([start_date + datetime.timedelta(hours=i) for i in range(8*24+1)])
     outdoor_temp_df = outdoor_temp_df.set_index(dates)
-    # Changed to do linear interpolation of temperature to avoid the sudden jumps
+    # Changed to do linear interpolation of temperature to avoid sudden jumps
     outdoor_temp_df = outdoor_temp_df.resample('5min').Resampler.interpolate(method='linear')
     temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
     outdoor_temp_df.columns = ['column1']
@@ -131,30 +130,13 @@ elif temp_data_interval == 60: #  for hourly data
 
 # get solar radiation. Solar.xlsx must be in run directory
 sol_df = pd.read_excel('Solar.xlsx', sheet_name=date_range)
-#q_solar_all=matrix(sol_df.to_numpy())
 q_solar = matrix(sol_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy()) #new version
-#print(q_solar)
 
 # get wholesale prices. WholesalePrice.xlsx must be in run directory
 price_df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range) #changed so no longer need to retype string, just change variable above.
-#wholesaleprice_all=matrix(price_df.to_numpy())
 cc=matrix(price_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())*PRICING_MULTIPLIER/1000+PRICING_OFFSET #new version
 
-
-# Extract just next 2 hours (prediction time) of data ---------
-#   Outside temp
-#temp_outdoor= temp_outdoor_all[(block-1)*12:(block-1)*12+n,0]
-#   Solar irradiation
-#q_solar=q_solar_all[(block-1)*12:(block-1)*12+n,0]
-#   Energy price
-#cc=wholesaleprice_all[(block-1)*12:(block-1)*12+n,0]*PRICING_MULTIPLIER/1000+PRICING_OFFSET
-#print('Price Old Version = ')
-#print(cc)
-#print('Price New Version = ')
-#print(cc2)
-
 # Compute Adaptive Setpoints
-# OK to remove if MODE != 'fixed' on your personal version only if the fixed mode is never used. Keep in master
 if MODE != 'fixed':
     # Max and min for heating and cooling in adaptive setpoint control for 90% of people [°C]
     HEAT_TEMP_MAX_90 = 26.2
@@ -166,19 +148,14 @@ if MODE != 'fixed':
     outdoor_to_heat90 = lambda x: x*0.31 + 15.8
     adaptive_cooling_90 = outdoor_temp_df.apply(outdoor_to_cool90)
     adaptive_heating_90 = outdoor_temp_df.apply(outdoor_to_heat90)
-    # print(adaptive_heating_90)
     # When temps too low or too high set to min or max (See adaptive setpoints)
     adaptive_cooling_90.loc[(adaptive_cooling_90['column1'] < COOL_TEMP_MIN_90)] = COOL_TEMP_MIN_90
     adaptive_cooling_90.loc[(adaptive_cooling_90['column1'] > COOL_TEMP_MAX_90)] = COOL_TEMP_MAX_90
     adaptive_heating_90.loc[(adaptive_heating_90['column1'] < HEAT_TEMP_MIN_90)] = HEAT_TEMP_MIN_90
     adaptive_heating_90.loc[(adaptive_heating_90['column1'] > HEAT_TEMP_MAX_90)] = HEAT_TEMP_MAX_90
     # change from pd dataframe to matrix
-    # print(adaptive_heating_90)
     adaptiveCool = matrix(adaptive_cooling_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
     adaptiveHeat = matrix(adaptive_heating_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
-    # print(adaptive_heating_90)
-    #adaptiveHeat = adaptive_heating_90[(block-1)*12:(block-1)*12+n,0]
-    #adaptiveCool = adaptive_cooling_90[(block-1)*12:(block-1)*12+n,0]
 
 if "occupancy" in MODE:
     # Min and max temperature for heating and cooling adaptive for 100% of people [°C]
@@ -186,7 +163,6 @@ if "occupancy" in MODE:
     HEAT_TEMP_MIN_100 = 18.4
     COOL_TEMP_MAX_100 = 29.7
     COOL_TEMP_MIN_100 = 22.4
-    
     # Furthest setback points allowed when building is unoccupied [°C]
     vacantCool = 32
     vacantHeat = 12
@@ -213,24 +189,18 @@ if "occupancy" in MODE:
         
         # hourly occupancy probability data to 5 minute intervals
         occ_prob_all = occupancy_df.Probability.resample('5min').interpolate(method='linear')
-        # Need to convert to array before this will work
-        # Get piece of dataframe then convert to array OR convert dataframe to array then get piece of array?
-        #occ_prob = occ_prob_all[(block-1)*12:(block-1)*12+n,0]
-        #occ_prob_df = occ_prob_all.iloc[(block-1)*12:(block-1)*12+n]
         
         # Calculate comfort band
         sigma = 3.937 # This was calculated based on adaptive comfort being normally distributed
         #Apply comfort bound function - requires using dataframe to do the lambda
         op_comfort_range = occ_prob_all.iloc[(block-1)*12:(block-1)*12+n].apply(lambda x: (1-x)/2)+1/2
         op_comfort_range = np.array(op_comfort_range.apply(lambda y: norm.ppf(y)*sigma))
-        #print (op_comfort_range)
         
         probHeat = adaptive_heating_100[(block-1)*12:(block-1)*12+n,0]-op_comfort_range
         probCool = adaptive_cooling_100[(block-1)*12:(block-1)*12+n,0]+op_comfort_range
         
     if MODE == 'occupancy' or MODE == 'occupancy_sensor':   
         occupancy_status = np.array(occupancy_df.Occupancy.iloc[(block-1)])
-        #print (occupancy_status)
         
     elif MODE == 'occupancy_precognition':
         occupancy_status_all = occupancy_df.Occupancy.resample('5min').pad()
@@ -240,7 +210,7 @@ if "occupancy" in MODE:
 
 # Optimization Setup ----------------------------------------------------------
 
-#can't actually be deleted
+# Initialize cost
 cost = 0
 
 # setting up optimization to minimize energy times price
@@ -291,7 +261,7 @@ coolineq = (cool_negative*x<=d)
 
 # Max heating and cooling capacity of HVAC system ------------
 energyLimit = matrix(0.25, (n,1)) # .4, 0.25 before
-#heatlimiteq = (cool_negative*x<=energyLimit) #this is wrong
+# Possible that the signs may be reversed on these
 heatlimiteq = (heat_positive * x <= energyLimit)
 coollimiteq = (cool_negative * x <= energyLimit)
 
@@ -323,16 +293,6 @@ spHeat = matrix(-999.9, (n,1))
 if 'occupancy' in MODE:
     # Occupany with both sensor and probability
     if MODE == 'occupancy': #For speed, putting this one first because it is the most common.
-        # Setpoint relative to probability 
-        #comfort_range = op_comfort_range[(block-1)*12:(block-1)*12+n,0]  # Update: this step done in data initialization
-        # Rename these from adaptiveHeat/cool because variables conflict with the 90% one
-        #probHeat = adaptive_heating_100[(block-1)*12:(block-1)*12+n,0]-op_comfort_range
-        #probCool = adaptive_cooling_100[(block-1)*12:(block-1)*12+n,0]+op_comfort_range
-        # Now done at the start when importing the data
-        #occupancy_status = occ_st[(block-1)*12:(block-1)*12+n,0]
-        # 90% adaptive setpoint for when occupied
-        #adaptiveHeat = adaptive_heating_90[(block-1)*12:(block-1)*12+n,0]
-        #adaptiveCool = adaptive_cooling_90[(block-1)*12:(block-1)*12+n,0]
         # String for displaying occupancy status
         occnow = ''
         # If occupancy is initially true (occupied)
@@ -354,15 +314,8 @@ if 'occupancy' in MODE:
             b[2*k,0]=spCool[k]-S[k,0]
             b[2*k+1,0]=-spHeat[k]+S[k,0]
             k = k + 1
-        #print(spHeat)
-        #print(adaptiveCool)
         
     elif MODE == 'occupancy_sensor':
-        # Use 90% adaptive comfort range
-        #adaptiveHeat = adaptive_heating_90[(block-1)*12:(block-1)*12+n,0]
-        #adaptiveCool = adaptive_cooling_90[(block-1)*12:(block-1)*12+n,0]
-        # done at the start
-        #occupancy_status = occ_st[(block-1)*12:(block-1)*12+n,0]
         occnow = ''
         # If occupancy is initially true (occupied)
         if occupancy_status == 1:
@@ -385,25 +338,17 @@ if 'occupancy' in MODE:
             k = k + 1
     
     elif MODE == 'occupancy_prob':
-        #comfort_range = op_comfort_range[(block-1)*12:(block-1)*12+n,0]
-        #adaptiveHeat = adaptive_heating_100[(block-1)*12:(block-1)*12+n,0]-op_comfort_range
-        #adaptiveCool = adaptive_cooling_100[(block-1)*12:(block-1)*12+n,0]+op_comfort_range
         occnow = 'UNKNOWN'
         spCool = probCool
         spHeat = probHeat
         while k<n:
-            #spCool[k,0] = probCool[k,0]
-            #spHeat[k,0] = probHeat[k,0]
             b[2*k,0]=probCool[k]-S[k,0]
             b[2*k+1,0]=-probHeat[k]+S[k,0]
             k=k+1
     
     # Infrequently used, so put last for speed
     elif MODE == 'occupancy_precognition':
-        #probHeat = adaptive_heating_100[(block-1)*12:(block-1)*12+n,0]-op_comfort_range
-        #probCool = adaptive_cooling_100[(block-1)*12:(block-1)*12+n,0]+op_comfort_range
-        #adaptiveHeat = adaptive_heating_90[(block-1)*12:(block-1)*12+n,0]
-        #adaptiveCool = adaptive_cooling_90[(block-1)*12:(block-1)*12+n,0]
+        # Create occupancy table
         occnow = '\nTIME\t STATUS \n'
         while k<n:
             # If occupied, use 90% adaptive setpoint
@@ -424,27 +369,20 @@ if 'occupancy' in MODE:
     
 # Adaptive setpoint without occupancy
 elif MODE == 'adaptive90':
-    #adaptiveHeat = adaptive_heating_90[(block-1)*12:(block-1)*12+n,0]
-    #adaptiveCool = adaptive_cooling_90[(block-1)*12:(block-1)*12+n,0]
     occnow = 'UNKNOWN'
     spCool = adaptiveCool
     spHeat = adaptiveHeat
     while k<n:
-        #spCool[k,0] = adaptiveCool[k,0]
-        #spHeat[k,0] = adaptiveHeat[k,0]
         b[2*k,0]=adaptiveCool[k,0]-S[k,0]
         b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
         k=k+1
 
 # Fixed setpoints - infrequently used, so put last
 elif MODE == 'fixed':
-    # For Fixed setpoints:
+    # Fixed setpoints:
     FIXED_UPPER = 23.0
     FIXED_LOWER = 20.0
     occnow = 'UNKNOWN'
-    # Imperfect workaround for needs to send array of adaptive cooling and heating setpoints
-    #adaptiveCool = matrix(FIXED_UPPER, (12,1))
-    #adaptiveHeat = matrix(FIXED_LOWER, (12,1))
     while k<n:
         spCool[k,0] = FIXED_UPPER
         spHeat[k,0] = FIXED_LOWER
@@ -491,7 +429,7 @@ elif heatorcool == 'cool':  # PJ eq 2.9; T^(n)_indoor =< T^(n)_comfort,lower
     lp2 = op(dot(-cc,x),ineq)
     op.addconstraint(lp2, coolineq)
     op.addconstraint(lp2,coollimiteq)
-else: #Catch if heat or cool setting is wrong before entering optimizer with invalid data
+else: #Detect if heat or cool setting is wrong before entering optimizer with invalid data
     print('\nFATAL ERROR: Invalid heat or cool setting, check \'heatorcool\' string. \n\nx x\n >\n ⁔\n')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING - ERROR')
     print('================================================\n')
@@ -500,8 +438,6 @@ else: #Catch if heat or cool setting is wrong before entering optimizer with inv
 lp2.solve()
 # ---------------------- solved -----------------------------
 
-#print('After opt   ')
-#print(b)
 
 # Catch Primal Infeasibility -------------------------------------------------------
 # If primal infeasibility is found (initial temperature is outside of comfort zone, 
@@ -523,15 +459,6 @@ if x.value == None:
     j=0
     temp_indoor = matrix(0.0, (nt,1))
     while j<nt:
-        # Set the temperature to the bounds for this simulation mode
-        #if heatorcool == 'cool' and MODE == 'fixed': # Cooling, fixed
-        #    temp_indoor[j]=FIXED_UPPER
-        #elif heatorcool == 'heat' and MODE == 'fixed': # Heating, fixed
-        #    temp_indoor[j]=FIXED_LOWER
-        #elif heatorcool == 'cool': # Cooling, adaptive
-        #    temp_indoor[j]=adaptiveCool[j,0]
-        #elif heatorcool == 'heat': # Heating adaptive
-        #    temp_indoor[j]=adaptiveHeat[j,0]
         if heatorcool == 'cool':
             temp_indoor[j] = spCool[j,0]
         else:
@@ -555,7 +482,6 @@ if x.value == None:
     j = 0
     while j<nt:
         print(temp_outdoor[j,0])
-        #print(temp_outdoor)
         j = j+1
     
     print('solar radiation')
@@ -595,18 +521,7 @@ p = 1
 while p<n:
     temp_indoor[p,0] = timestep*(c1*(temp_outdoor[p-1,0]-temp_indoor[p-1,0])+c2*energy[p-1,0]+c3*q_solar[p-1,0])+temp_indoor[p-1,0]
     p = p+1
-# Output[(block-1)*12:(block-1)*12+n,0] = energy[0:n,0] #0:12
-# Output[(block-1)*12:(block-1)*12+n,1] = temp_indoor[0:n,0] #0:12
 cost = cost + lp2.objective.value()    
-#cost = cost + cc[0:12,0].trans()*energy[0:12,0]
-# temp_indoor_initial= temp_indoor[12,0]
-
-# # solve for thermostat temperature at each timestep
-# thermo = matrix(0.0, (n,1))
-# i = 0
-# while i<n:
-#     thermo[i,0] = (-d2*temp_indoor[i,0]-d3*temp_outdoor[i]-d4*q_solar[i]+energy[i]*1000/12)/d1
-#     i = i+1
 
 # Zero Energy Correction ----------------------------------------------------------------
 # Problem: if the indoor temperature prediction overestimates the amount of natural heating in heat setting, 
@@ -614,28 +529,13 @@ cost = cost + lp2.objective.value()
 # make the setpoints equal to the estimate, EP may not have that natural change, and instead need to run 
 # HVAC unnecessarily. Since the optimizer doesn't expect HVAC to run when the energy usage = 0, make the 
 # setpoints = comfort zone bounds to prevent this.
-p=0
 if HRO:
     print('Indoor Temperature Prediction Before Zero Energy Correction')
     print(temp_indoor)
     print()
-
+p=0
 while p<nt:
-    #if MODE != 'fixed': # Adaptive and occupancy set to adaptive bounds
-    #    if heatorcool == 'cool':
-    #       if energy[p] > -0.0001:
-    #            temp_indoor[p] = adaptiveCool[p]
-    #    else:
-    #        if energy[p] < 0.0001:
-    #            temp_indoor[p]=adaptiveHeat[p,0]
-    #else: # If fixed, set to fixed bounds
-    #    if heatorcool == 'cool':
-    #        if energy[p] > -0.0001:
-    #            temp_indoor[p] = FIXED_UPPER
-    #    else:
-    #        if energy[p] < 0.0001:
-    #            temp_indoor[p]=FIXED_LOWER
-    # Using spHeat and spCool as easier way
+    # If energy is near zero, change setpoint to bound spHeat or spCool
     if heatorcool == 'cool' and energy[p] > -0.0001:
         temp_indoor[p] = spCool[p,0]
     elif heatorcool == 'heat' and energy[p] < 0.0001:
@@ -658,7 +558,6 @@ print('indoor temp prediction')
 j = 0
 while j<nt:
     print(temp_indoor[j,0])
-    #print(temp_indoor)
     j = j+1
 
 print('pricing per timestep')
@@ -692,19 +591,6 @@ if HRO:
         print(spCool[j,0])
         j=j+1
 
-# print(Output)
-# with pd.ExcelWriter('OutdoorTemp.xlsx', OCCUPANCY_MODE ='a') as writ # 'Occupancy',
-# er:
-# #    Output.to_excel(writer, sheet_name = 'Sheet2')
-#     df = pd.DataFrame(Output).T
-#     df.to_excel(writer, sheet_name = 'Sheet2')
-# print("Total price =") 
-# print(cost)
-# print("Thermostat setup =") 
-# print(thermo)
-# print("Indoor Temperature =") 
-# print(temp_indoor)
-#print("--- %s seconds ---" % (time.process_time()-start_time))
 
 # Footer for human-readable output
 if HRO:
