@@ -1,7 +1,7 @@
 # energyOptTset2hr.py
 # Author(s):    PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-# Version:      4.0-Beta
-# Last Updated: 2021-07-09
+# Version:      4.1-Beta
+# Last Updated: 2021-07-13
 # Changelog:
 # - Added switching for adaptive vs fixed vs occupancy control - Brian
 # - Added occupancy optimization - Brian
@@ -36,12 +36,15 @@ from scipy.stats import norm
 #   'Feb12thru19'
 #   'Sept27thruOct3'
 #   'July1thru7'
-#   'bugoff': For debugging and testing specific inputs. Run with day = 1, hour = 0.
-#   'bugfreeze': Extreme cold values for testing. Run with day = 1, hour = 0.
-#   'bugcook': Extreme hot values for testing. Run with day = 1, hour = 0.
+#   'bugoff': For debugging and testing specific inputs. Hot w rapid cool off. Run with day = 1, hour = 0.
+#   'bugfreeze': Extreme cold values, rapidly gets colder, for testing. Run with day = 1, hour = 0.
+#   'bugcook': Extreme hot values, cools briefly then gets hotter for testing. Run with day = 1, hour = 0.
+#   'bugsnug': Comfortable 18-23°C for testing both heat and cool.
+#   'bugwarm': Less extreme hot than bugcook mode
+#   'bugAC': Figure out why cool mode keeps failing if the price changes
+#   'bughprice': Analogous to bugAC but for heating with price change
 # Make sure to put in single quotes
-# TODO add debug option
-date_range = 'bugcook' 
+date_range = 'bugAC' 
 
 # ===> SET HEATING VS COOLING! <=== CHECK! IMPORTANT!!!
 #   'heat': only heater, use in winter
@@ -57,12 +60,12 @@ heatorcool = 'cool'
 #   'occupancy_precognition': Optimize if occupancy status for entire prediction period (2 hrs into future) is known. A joke!?
 MODE = 'occupancy'
 
-# ===> Human Readable Display (HRD) SETTING <===
+# ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
-# These may not be recognized by UCEF Controller.java so HRD = false when running full simulations
-HRD = True
-# Print HRD Header
-if HRD:
+# These may not be recognized by UCEF Controller.java so HRO = false when running full simulations
+HRO = True
+# Print HRO Header
+if HRO:
     print()
     print('=========== energyOptTset2hr.py V4.0 ===========')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: RUNNING')
@@ -73,12 +76,14 @@ if HRD:
 temp_data_interval = 5
 
 # Time constants. Default is set for 1 week.
-n=24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window)
-nt = 13 # Number of effective predicted timesteps
+n= 24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window)
+nt = 14 # Number of effective predicted timesteps
 n_occ = 12 # number of timesteps for which occupancy data is considered known (12 = first hour for hourly occupancy data)
 timestep = 5*60
-days = 7
-totaltimesteps = days*12*24+3*12
+# No longer used but kept for potential future use.
+#days = 7
+#totaltimesteps = days*12*24+3*12
+
 # Pricing constants.
 PRICING_MULTIPLIER = 4.0
 PRICING_OFFSET = 0.10
@@ -91,7 +96,6 @@ PRICING_OFFSET = 0.10
 #   day = [int] day number in simulation. 1 =< day =< [Number of days in simulation]
 #   hour = [int] hour of the day. 12am = 0, 12pm = 11, 11pm = 23
 #   temp_indoor_initial = [float] the initial indoor temperature in °C
-
 day = int(sys.argv[1])
 block = int(sys.argv[2]) +1+(day-1)*24 # block goes 0:23 (represents the hour within a day)
 temp_indoor_initial = float(sys.argv[3])
@@ -107,14 +111,14 @@ c3 = 3.58*10**-7
 # Get data from excel/csv files -----------------------------------------------
 #   All xlsx files have single col of numbers at 5 minute intervals, starting on 2nd row. Only 3rd row and below is detected I think.
 
-# Get outdoor temps
+# Get outdoor temps [°C]
 if temp_data_interval == 5: # 5 minutes can use directly
     outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range,header=0)
     #temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
     outdoor_temp_df.columns = ['column1']
     temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy()) #new
 elif temp_data_interval == 60: #  for hourly data
-    outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name='Feb12thru19_2021_1hr',header=0)
+    outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range+'_2021_1hr',header=0)
     start_date = datetime.datetime(2021,2,12)
     dates = np.array([start_date + datetime.timedelta(hours=i) for i in range(8*24+1)])
     outdoor_temp_df = outdoor_temp_df.set_index(dates)
@@ -122,6 +126,7 @@ elif temp_data_interval == 60: #  for hourly data
     outdoor_temp_df = outdoor_temp_df.resample('5min').Resampler.interpolate(method='linear')
     temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
     outdoor_temp_df.columns = ['column1']
+    temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
     #Leave outdoor_temp_df as type dataframe for later computations
 
 # get solar radiation. Solar.xlsx must be in run directory
@@ -265,7 +270,7 @@ while k<n:
 heat_positive = matrix(0.0, (n,n))
 i = 0
 while i<n:
-    #Heat_positive is a diagonal matrix with ones on diagonal; entire matrix equals 0
+    #Heat_positive is a diagonal matrix with -1 on diagonal
     heat_positive[i,i] = -1.0 # setting boundary condition: Energy used at each timestep must be greater than 0
     i +=1
     
@@ -273,17 +278,22 @@ while i<n:
 cool_negative = matrix(0.0, (n,n))
 i = 0
 while i<n:
-    #cool_negative is a diagonal matrix with -1 on diagonal; entire matrix equals 0
+    #cool_negative is a diagonal matrix with 1 on diagonal
     cool_negative[i,i] = 1.0 # setting boundary condition: Energy used at each timestep must be less than 0
     i +=1
 
+# Right hand of equality 1 x n matrix of zeros
 d = matrix(0.0, (n,1))
 
-# inequality constraints
+# inequality constraints - diagonal matrices <= 0
 heatineq = (heat_positive*x<=d)
 coolineq = (cool_negative*x<=d)
+
+# Max heating and cooling capacity of HVAC system ------------
 energyLimit = matrix(0.25, (n,1)) # .4, 0.25 before
-heatlimiteq = (cool_negative*x<=energyLimit)
+#heatlimiteq = (cool_negative*x<=energyLimit) #this is wrong
+heatlimiteq = (heat_positive * x <= energyLimit)
+coollimiteq = (cool_negative * x <= energyLimit)
 
 
 # creating S matrix to make b matrix simpler -----------------
@@ -301,9 +311,9 @@ while i<n:
 b = matrix(0.0, (n*2,1))
 # Initialize counter 
 k = 0
-# Initialize matrices for cool and heat setpoints. Will hold correct ones for the selected mode.
-spCool = matrix(0.0, (n,1))
-spHeat = matrix(0.0, (n,1))
+# Initialize matrices for cool and heat setpoints with flag values. These will contain setpoints for the selected MODE.
+spCool = matrix(-999.9, (n,1))
+spHeat = matrix(-999.9, (n,1))
 
 # Temperature bounds for b matrix depend on MODE. 
 # Loop structure is designed to reduce unnecessary computation and speed up program. Once an "if" or "elif" 
@@ -323,6 +333,7 @@ if 'occupancy' in MODE:
         # 90% adaptive setpoint for when occupied
         #adaptiveHeat = adaptive_heating_90[(block-1)*12:(block-1)*12+n,0]
         #adaptiveCool = adaptive_cooling_90[(block-1)*12:(block-1)*12+n,0]
+        # String for displaying occupancy status
         occnow = ''
         # If occupancy is initially true (occupied)
         if occupancy_status == 1:
@@ -441,26 +452,36 @@ elif MODE == 'fixed':
         b[2*k+1,0]=-FIXED_LOWER+S[k,0]
         k=k+1
 
-#print('Before opt   ')
-#print(b)
 # Human readable output ----------------------------
-if HRD:
+if HRO:
     print('MODE = ' + MODE)
     print('Date Range: ' + date_range)
     print('Day = ' + str(day))
     print('Block = ' + str(block))
     print('Initial Temperature Inside = ' + str(temp_indoor_initial) + ' °C')
     print('Initial Temperature Outdoors = ' + str(temp_outdoor[0,0]) + ' °C')
-    print('Initial Max Temp = ' + str(spHeat[0,0]) + ' °C')
-    print('Initial Min Temp = ' + str(spCool[0,0]) + ' °C\n')
+    print('Initial Max Temp = ' + str(spCool[0,0]) + ' °C')
+    print('Initial Min Temp = ' + str(spHeat[0,0]) + ' °C\n')
     if occnow == '':
         occnow = 'VACANT'
     print('Current Occupancy Status: ' + occnow)
+    # Detect invalid MODE before it breaks optimizer
+    if spCool[1,0] == 999.9 or spHeat[1,0] == 999.9:
+        print('FATAL ERROR: Invalid mode, check \'MODE\' string. \n\nx x\n >\n ⁔\n')
+        print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING - ERROR')
+        print('================================================\n')
+        exit()
     print('\nCVXOPT Output: ')
 
 # Final Optimization -------------------------------------------------------------
 # Solve for energy at each timestep
 ineq = (AA*x <= b)
+
+# For debug only
+print('Before opt \nb = \n')
+print(b)
+print (ineq)
+
 #Solve comfort zone inequalities 
 if heatorcool == 'heat': # PJ eq 2.8; T^(n)_indoor >= T^(n)_comfort,lower
     lp2 = op(dot(cc,x),ineq)
@@ -469,6 +490,12 @@ if heatorcool == 'heat': # PJ eq 2.8; T^(n)_indoor >= T^(n)_comfort,lower
 elif heatorcool == 'cool':  # PJ eq 2.9; T^(n)_indoor =< T^(n)_comfort,lower
     lp2 = op(dot(-cc,x),ineq)
     op.addconstraint(lp2, coolineq)
+    op.addconstraint(lp2,coollimiteq)
+else: #Catch if heat or cool setting is wrong before entering optimizer with invalid data
+    print('\nFATAL ERROR: Invalid heat or cool setting, check \'heatorcool\' string. \n\nx x\n >\n ⁔\n')
+    print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING - ERROR')
+    print('================================================\n')
+    exit()
 #Tells CVXOPT to solve the problem
 lp2.solve()
 # ---------------------- solved -----------------------------
@@ -482,8 +509,8 @@ lp2.solve()
 # the predicted indoor temperature to the comfort region bound.
 if x.value == None:
     # Added warning message
-    if HRD:
-        print('\nWARNING: Initial temperature out of bounds, resorting to defaults\n')
+    if HRO:
+        print('\nWARNING: Temperature exceeds bounds, resorting to unoptimized default\n')
     
     #Set energy consumption = 0
     energy = matrix(0.00, (nt,1))
@@ -494,7 +521,7 @@ if x.value == None:
         j = j+1
     # Reset indoor temperature setting to defaults
     j=0
-    temp_indoor = matrix(0.0, (totaltimesteps,1))
+    temp_indoor = matrix(0.0, (nt,1))
     while j<nt:
         # Set the temperature to the bounds for this simulation mode
         #if heatorcool == 'cool' and MODE == 'fixed': # Cooling, fixed
@@ -537,16 +564,16 @@ if x.value == None:
         print(q_solar[j,0])
         j = j+1
     
-    if HRD:
+    if HRO:
         print('adaptive heating setpoints')
         j = 0
-        while j<12:
+        while j<nt:
             print(spHeat[j,0])
             j=j+1
         
         print('adaptive cooling setpoints')
         j = 0
-        while j<12:
+        while j<nt:
             print(spCool[j,0])
             j=j+1
             
@@ -588,10 +615,11 @@ cost = cost + lp2.objective.value()
 # HVAC unnecessarily. Since the optimizer doesn't expect HVAC to run when the energy usage = 0, make the 
 # setpoints = comfort zone bounds to prevent this.
 p=0
-if HRD:
-    print('Before Zero Energy Correction')
+if HRO:
+    print('Indoor Temperature Prediction Before Zero Energy Correction')
     print(temp_indoor)
     print()
+
 while p<nt:
     #if MODE != 'fixed': # Adaptive and occupancy set to adaptive bounds
     #    if heatorcool == 'cool':
@@ -613,8 +641,8 @@ while p<nt:
     elif heatorcool == 'heat' and energy[p] < 0.0001:
         temp_indoor[p] = spHeat[p,0]
     p = p+1
-if HRD:
-    print('After Zero Energy Correction')
+if HRO:
+    print('Indoor Temperature Setting After Zero Energy Correction')
     print(temp_indoor[:,0])
     print()
 
@@ -651,7 +679,7 @@ while j<nt:
     print(q_solar[j,0])
     j = j+1
 
-if HRD:
+if HRO:
     print('optimal heating setpoints')
     j = 0
     while j<nt:
@@ -678,7 +706,7 @@ if HRD:
 # print(temp_indoor)
 #print("--- %s seconds ---" % (time.process_time()-start_time))
 
-# Footer for human-readable display
-if HRD:
+# Footer for human-readable output
+if HRO:
     print('\n@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING - OPTIMIZATION SUCCESS')
     print('================================================\n')
