@@ -9,6 +9,7 @@ Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulati
 * Change booleans in Controller.java & energyOptTSet.py to set Fixed vs Adaptive and Optimized vs Not Optimized
 * Compile Controller.java and Socket.java
 * See https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki for UCEF operation.
+* Change date_range, heatorcool, MODE, HRO settings on energyOptTset.py
 
 ### Run Instructions - EP
 * Open .idf in EP
@@ -19,6 +20,14 @@ Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulati
 * Wait until the Socket says "Waiting for Energy Plus simulations to join" before starting the simulation
 
 ### Changelog
+2021-07-14 (Brian)
+* Complete overhaul of energyOptTset2hr.py
+* Occupancy optimization with 3 modes, along with optimization of fixed and adaptive setpoints, with easy switching at the top of the file between the options using MODE
+* Easy to change dates
+* Easy to change cooling vs heating mode
+* Extra debugging options
+* Bug: indoor temperature prediction is one step behind the energy, causing it to miss some energy savings.
+* A minor update to fix bug is expected by 2021-07-16
 
 2021-06-30 (Brian)
 * Automate file naming in Controller.java; instead of searching directories and appending the Data Summary text files with more data, it now goes directly to the current deployment directory and creates a new file with the current date and time as part of the file name to differentiate them. 
