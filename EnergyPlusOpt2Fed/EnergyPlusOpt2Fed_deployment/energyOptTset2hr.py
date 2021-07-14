@@ -1,15 +1,17 @@
 # energyOptTset2hr.py
 # Author(s):    PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-# Version:      4.1-Beta
-# Last Updated: 2021-07-13
+# Version:      4.2
+# Last Updated: 2021-07-14
 # Changelog:
 # - Added switching for adaptive vs fixed vs occupancy control - Brian
 # - Added occupancy optimization - Brian
 # - Fixed optimizer should not know occupancy status beyond current time
-# - Merging 2 codes, keeping the best characteristics of each
-# - Base code is energyOptTset2hr_kaleb.py, with stuff from the PJ/Brian one added
 # - Runtime reduced from 2.0 +/- 0.5s to 1.0 +/- 0.5s by moving mode-specific steps inside "if" statements
 #   and taking dataframe subsets before transformation to matrices
+# - Both heat and cool modes work mostly as they are supposed to.
+# Known Bugs:
+# - Indoor temperature prediction is one step behind the energy, causing it to miss some energy savings.
+# - An updated version is expected by 2021-07-16
 # Usage:
 #   Typically run from Controller.java in UCEF energyPlusOpt2Fed or EP_MultipleSims. Will be run again for every hour of simulation.
 #   For debugging, can run as python script. In folder where this is stored:
@@ -43,12 +45,12 @@ from scipy.stats import norm
 #   'bugAC': Figure out why cool mode keeps failing if the price changes
 #   'bughprice': Analogous to bugAC but for heating with price change
 # Make sure to put in single quotes
-date_range = 'bugAC' 
+date_range = 'bughprice' 
 
 # ===> SET HEATING VS COOLING! <=== CHECK! IMPORTANT!!!
 #   'heat': only heater, use in winter
 #   'cool': only AC, use in summer
-heatorcool = 'cool'
+heatorcool = 'heat'
 
 # ===> MODE <===
 #   'occupancy': the primary operation mode. Optimization combining probability data and current occupancy status
@@ -57,7 +59,7 @@ heatorcool = 'cool'
 #   'adaptive90': optimization with adaptive setpoints where 90% people are comfortable. No occupancy
 #   'fixed': optimization with fixed setpoints. No occupany.
 #   'occupancy_precognition': Optimize if occupancy status for entire prediction period (2 hrs into future) is known. A joke!?
-MODE = 'adaptive90'
+MODE = 'occupancy'
 
 # ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
@@ -66,8 +68,11 @@ HRO = True
 # Print HRO Header
 if HRO:
     print()
-    print('=========== energyOptTset2hr.py V4.0 ===========')
+    print('=========== energyOptTset2hr.py V4.2 ===========')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: RUNNING')
+
+# Debug Setting - For developers debugging the b, D, AA, ineq matrices, leave false if you have no idea what this means
+HRO_DEBUG = False
 
 # Constants that should not be changed without a good reason -----------------
 
@@ -76,7 +81,7 @@ temp_data_interval = 5
 
 # Time constants. Default is set for 1 week.
 n= 24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window)
-nt = 14 # Number of effective predicted timesteps
+nt = 12 # Number of effective predicted timesteps
 n_occ = 12 # number of timesteps for which occupancy data is considered known (12 = first hour for hourly occupancy data)
 timestep = 5*60
 # No longer used but kept for potential future use:
@@ -95,17 +100,13 @@ PRICING_OFFSET = 0.10
 #   day = [int] day number in simulation. 1 =< day =< [Number of days in simulation]
 #   hour = [int] hour of the day. 12am = 0, 12pm = 11, 11pm = 23
 #   temp_indoor_initial = [float] the initial indoor temperature in °C
-#   nt = number of 5 minute timesteps to return prediction for.
 day = int(sys.argv[1])
 block = int(sys.argv[2]) +1+(day-1)*24 # block goes 0:23 (represents the hour within a day)
 temp_indoor_initial = float(sys.argv[3])
 
 # constant coefficients for indoor temperature equation ------------------------
 c1 = 1.72*10**-5
-if heatorcool == 'heat':
-    c2 = 0.0031
-else:
-    c2 = -0.0031
+c2 = 0.0031
 c3 = 3.58*10**-7
 
 # Get data from excel/csv files -----------------------------------------------
@@ -121,7 +122,7 @@ elif temp_data_interval == 60: #  for hourly data
     start_date = datetime.datetime(2021,2,12)
     dates = np.array([start_date + datetime.timedelta(hours=i) for i in range(8*24+1)])
     outdoor_temp_df = outdoor_temp_df.set_index(dates)
-    # Changed to do linear interpolation of temperature to avoid sudden jumps
+    # Changed to do linear interpolation of temperature to avoid the sudden jumps
     outdoor_temp_df = outdoor_temp_df.resample('5min').Resampler.interpolate(method='linear')
     temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
     outdoor_temp_df.columns = ['column1']
@@ -130,7 +131,7 @@ elif temp_data_interval == 60: #  for hourly data
 
 # get solar radiation. Solar.xlsx must be in run directory
 sol_df = pd.read_excel('Solar.xlsx', sheet_name=date_range)
-q_solar = matrix(sol_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy()) #new version
+q_solar = matrix(sol_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy()) 
 
 # get wholesale prices. WholesalePrice.xlsx must be in run directory
 price_df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range) #changed so no longer need to retype string, just change variable above.
@@ -241,6 +242,7 @@ heat_positive = matrix(0.0, (n,n))
 i = 0
 while i<n:
     #Heat_positive is a diagonal matrix with -1 on diagonal
+    # will get multiplied by energy x, which is positive
     heat_positive[i,i] = -1.0 # setting boundary condition: Energy used at each timestep must be greater than 0
     i +=1
     
@@ -249,6 +251,7 @@ cool_negative = matrix(0.0, (n,n))
 i = 0
 while i<n:
     #cool_negative is a diagonal matrix with 1 on diagonal
+    # will get multiplied by energy x, which is negative
     cool_negative[i,i] = 1.0 # setting boundary condition: Energy used at each timestep must be less than 0
     i +=1
 
@@ -261,7 +264,7 @@ coolineq = (cool_negative*x<=d)
 
 # Max heating and cooling capacity of HVAC system ------------
 energyLimit = matrix(0.25, (n,1)) # .4, 0.25 before
-# Possible that the signs may be reversed on these
+# enforce |E_used[n]| <= E_max
 heatlimiteq = (heat_positive * x <= energyLimit)
 coollimiteq = (cool_negative * x <= energyLimit)
 
@@ -412,21 +415,30 @@ if HRO:
     print('\nCVXOPT Output: ')
 
 # Final Optimization -------------------------------------------------------------
-# Solve for energy at each timestep
-ineq = (AA*x <= b)
+# Solve for energy at each timestep. Constraint D*E^n_used <= b, D = AA, E^n_used = x
+# Cool (rows 0, 2, 4, ...)  D_m[n] * E_used[n] <= T_comfort,upper[n] - S[n]
+# Heat (rows 1, 3, 5, ...) D_m[n] * E_used[n] <= -T_comfort,lower[n] + S[n]
+ineq = (AA*x <= b) 
 
 # For debug only
-print('Before opt \nb = \n')
-print(b)
-print (ineq)
+if HRO_DEBUG:
+    print('Before opt \nS = \n')
+    print(S)
+    print('\nb = \n')
+    print(b)
+    print('\nMatrix x = \n')
+    print(x)
+    print('\nMatrix AA = \n')
+    print
 
 #Solve comfort zone inequalities 
 if heatorcool == 'heat': # PJ eq 2.8; T^(n)_indoor >= T^(n)_comfort,lower
+    # Minimize price cc, energy x, with constraint ineq
     lp2 = op(dot(cc,x),ineq)
     op.addconstraint(lp2, heatineq)
     op.addconstraint(lp2,heatlimiteq)
 elif heatorcool == 'cool':  # PJ eq 2.9; T^(n)_indoor =< T^(n)_comfort,lower
-    lp2 = op(dot(-cc,x),ineq)
+    lp2 = op(dot(cc,x),ineq) 
     op.addconstraint(lp2, coolineq)
     op.addconstraint(lp2,coollimiteq)
 else: #Detect if heat or cool setting is wrong before entering optimizer with invalid data
@@ -491,13 +503,13 @@ if x.value == None:
         j = j+1
     
     if HRO:
-        print('adaptive heating setpoints')
+        print('\nheating setpoints')
         j = 0
         while j<nt:
             print(spHeat[j,0])
             j=j+1
         
-        print('adaptive cooling setpoints')
+        print('\ncooling setpoints')
         j = 0
         while j<nt:
             print(spCool[j,0])
@@ -530,7 +542,7 @@ cost = cost + lp2.objective.value()
 # HVAC unnecessarily. Since the optimizer doesn't expect HVAC to run when the energy usage = 0, make the 
 # setpoints = comfort zone bounds to prevent this.
 if HRO:
-    print('Indoor Temperature Prediction Before Zero Energy Correction')
+    print('\nIndoor Temperature Prediction Before Zero Energy Correction')
     print(temp_indoor)
     print()
 p=0
@@ -579,13 +591,13 @@ while j<nt:
     j = j+1
 
 if HRO:
-    print('optimal heating setpoints')
+    print('\nheating setpoint bounds')
     j = 0
     while j<nt:
         print(spHeat[j,0])
         j=j+1
 
-    print('optimal cooling setpoints')
+    print('cooling setpoint bounds')
     j = 0
     while j<nt:
         print(spCool[j,0])
