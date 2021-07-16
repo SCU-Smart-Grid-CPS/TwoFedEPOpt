@@ -1,15 +1,21 @@
 /*
-File:		controller.java
-Author(s):	PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-Last Updated:	2021-06-30
-Notes:		Code for the optimization simulations. Changed to use /* comment style to be easier to activate/deactivate
-		parts of the code. Cleaned up organization.
-Run:		Change file paths in this code. Then build or build-all. Run as part of federation.
-For Optimization both Fixed and Adaptive, UNcomment the big optimization section, and COMMENT all other fixed and adaptive sections
-UPDATE:	No need to comment or uncomment anymore - Instead change booleans optimizeSet and adaptiveSet around line 48
-		old commenting instructions kept because it has not been tested with every combination yet and it might be buggy
-		No more long filepaths to change! Instead it saves to the run directory (usually deployment) by default!
-		EP and CVXOPT Data Summary file paths have a date + time format so they don't overwrite previous runs.
+File:           controller.java
+Author(s):      PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
+Version:        2.8 - BETA
+Last Updated:   2021-07-15
+Notes: Code for the optimization simulations. Changed to use /* comment style to be easier to activate/deactivate
+        parts of the code. Cleaned up organization.
+Run:   Change file paths in this code. Then build or build-all. Run as part of federation.
+UPDATE: No need to comment or uncomment anymore - Instead change booleans optimizeSet and adaptiveSet around line 48
+        old commenting instructions kept because it has not been tested with every combination yet and it might be buggy
+        No more long filepaths to change! Instead it saves to the run directory (usually deployment) by default!
+        EP and CVXOPT Data Summary file paths have a date + time format so they don't overwrite previous runs.
+*Changelog:
+    * Added compatibility with occupancyAdaptSetpoints.py
+    * Added use config file instead of changing variables in here to reduce recompiling
+    * Fixed datastring receiver from Python so that datastrings do not continually append with data for the next datastring
+    * Cleaned up code
+    * Has variables needed for more frequent optimization calls but does not work because of energyOptTset2hr limitations
 */
 
 package org.webgme.guest.controller;
@@ -48,9 +54,14 @@ public class Controller extends ControllerBase {
         super(params);
     }
 
-	//Determine Setpoint Type --- CHANGE THIS TO DETERMINE SETTING
-	boolean optimizeSet = true; //True if optimized, false if not optimized
-	boolean adaptiveSet = true; //True if using adaptive setpoint, false if fixed setpoint. Not used if optimizeSet = true.
+    //Determine Setpoint Type --- Leave these false
+    boolean optimizeSet = false; //True if optimized, false if not optimized
+    boolean adaptiveSet = false; //True if using adaptive setpoint, false if fixed setpoint. Not used if optimizeSet = true.
+    boolean occupancySet = false;
+    
+    // Number of optimization to run per hour. Default is 1
+    int timestepsToOpt = 12;
+    int nopt = 12/timestepsToOpt;
 
     // Kaleb // defining  global variables
     int numSockets = 1;  // Change this
@@ -81,17 +92,17 @@ public class Controller extends ControllerBase {
     String varNameSeparater = "@";
     String doubleSeparater = ",";
     String optDataString = "";
-    int day = 0;
+    int day = 0, p = 0;
 
-    int hour=0, nexthour=0, quarter=0, fivemin=0, onemin=0, simulatetime=0;
-    double r1 =0.0;
-    double Preset_cool=23.0, Preset_heat=20.0; // changed preset cool from 21.0 - PJ
-    double event_p=0.0, duration_p=1.0, duration_q=0.0, nextevent_p=0.0;
-    int occupancy = 2, check = 0, p=0, r2=0;
+    //int hour=0, nexthour=0, quarter=0, fivemin=0, onemin=0, simulatetime=0;
+    //double r1 =0.0;
+    //double Preset_cool=23.0, Preset_heat=20.0; // changed preset cool from 21.0 - PJ
+    //double event_p=0.0, duration_p=1.0, duration_q=0.0, nextevent_p=0.0;
+    //int occupancy = 2, check = 0, p=0, r2=0;
 
-    String varname="";
-    double value=0.0;
-    double Last_cool=23.0, Last_heat=20.0; // changed Last_heat from 21.0 - PJ
+    //String varname="";
+    //double value=0.0;
+    //double Last_cool=23.0, Last_heat=20.0; // changed Last_heat from 21.0 - PJ
 
     boolean receivedSocket = false;
     boolean receivedMarket = false;
@@ -109,12 +120,40 @@ public class Controller extends ControllerBase {
     // Need to do this here because otherwise the date time string might change during the simulation
     String datime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
     
-
-    // REMOVE NEXT TWO LINES!! this was for testing preloading weather
-    // double[] outTemperature = new double[]{7.2,6.7,6.1,4.4,4.4,6.1,5,7.8,8.9,9.4,10,10.6,11.1,13.9,13.9,11.1,11.1,10.6,10.6,8.9,9.4,7.8,6.7,8.9,6.1,5.6,3.9,5.6,7.2,7.8,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10};
-    // int yeet = 0;
-    // Kaleb //
-
+    // Read simulation settings from config.txt _____________________________________
+    log.info("create bufferedReader");
+    File file= new File("config.txt");
+    BufferedReader br = new BufferedReader(new FileReader(file));
+    log.info("bufferedreader successful");
+    String st = "";
+    String mode = "";
+    String heatOrCool = "";
+    String dateRange = "";
+    while ((st = br.readLine())!=null){
+        log.info(st);
+        if(st.equals("MODE:")){
+            mode = br.readLine();
+        }
+        else if(st.equals("heatorcool:")){
+            heatOrCool = br.readLine();
+        }
+        else if(st.equals("date_range:")){
+            dateRange = br.readLine();
+        }
+        else if(st.equals("optimize:")){
+            optimizeSet = Boolean.parseBoolean(br.readLine());
+        }
+    }
+    log.info("Mode: " + mode);
+    log.info("Heat or Cool: " + heatOrCool);
+    log.info("Date Range: " + dateRange);
+    log.info("Optimize: " + optimizeSet);
+    // figure out occupancySet and adaptiveSet booleans
+    if(!optimizeSet){
+        if(mode.contains("occupancy")) occupancySet = true;
+        else if(mode.contains("adaptive")) adaptiveSet = true;
+    }
+    // end config.txt --------------------------------------------------------
 
     private void checkReceivedSubscriptions() {
         InteractionRoot interaction = null;
@@ -128,6 +167,7 @@ public class Controller extends ControllerBase {
         }
     }
 
+// Giant method for what Controller does every timestep ____________________________
     private void execute() throws Exception {
         if(super.isLateJoiner()) {
             log.info("turning off time regulation (late joiner)");
@@ -183,10 +223,9 @@ public class Controller extends ControllerBase {
 
             System.out.println("timestep before receiving Socket/Reader: "+ currentTime);
             log.info("timestep before receiving Socket/Reader: ",currentTime);
-            // waiting to receive Socket_Controller and Reader_Controller
+            // Waits to receive Socket_Controller and Reader_Controller to ensure everything stays on the same timestep
             while (!(receivedSocket)){
-
-                //while ((!(receivedSocket) || !(receivedReader))){
+                //while ((!(receivedSocket) || !(receivedReader))){ // Reader stuff is commented out because Reader not currently used
                 log.info("waiting to receive Socket_Controller interaction...");
                 synchronized(lrc){
                     lrc.tick();
@@ -195,15 +234,15 @@ public class Controller extends ControllerBase {
                 if(!receivedSocket){
                     CpswtUtils.sleep(100);
                 }
-                // }else if(!receivedReader){
-                //   log.info("waiting on Reader_Controller...");
-                //   CpswtUtils.sleep(100);
-                // }
+            /* }else if(!receivedReader){
+                   log.info("waiting on Reader_Controller...");
+                   CpswtUtils.sleep(100);
+               }*/
             }
           receivedSocket = false;
           receivedReader = false;
           System.out.println("timestep after receiving Socket/Reader and before sending to Market: "+ currentTime);
-/*          
+/*         // Market stuff; commented out because Market is not currently used
            // TODO send Controller_Market here! vvvvvvvv
            log.info("sending Controller_Market interaction");
            Controller_Market sendMarket = create_Controller_Market();
@@ -230,7 +269,7 @@ public class Controller extends ControllerBase {
            System.out.println("timestep after receiving Market: "+ currentTime);
 */
 
-         // PJ's optimization
+        // OPTIMIZATION _______________________________________________________________________ 
             // Reset variables to defaults
             double hour = (double) ((currentTime%288) / 12);
             log.info("hour is: ",hour);
@@ -244,25 +283,19 @@ public class Controller extends ControllerBase {
             String sblock = null;
             String sday = null;
             String separatorOpt = ",";
-            boolean	startSavingE = false;
+            boolean startSavingE = false;
             boolean startSavingT = false;
             boolean startSavingP = false;
             boolean startSavingO = false;
             boolean startSavingS = false;
 
-// OPTIMIZATION
-     
-// comment here to stop optimization process in Fixed wo Opt and Adaptive wo Opt
-	//_______________________________________________________________________
-	
-	// Add temporarily to deliniate where it enters optimization part
-	//System.out.println("== Begin Optimization ==");
-	if (optimizeSet){
+        if (optimizeSet || occupancySet){
+            // At beginning of the day, increment day
              if (hour == 0){
                  day = day+1;
              }
-            
-             if (hour%1 == 0){
+             // on the whole hours only, run the optimization
+             if (hour%nopt == 0){
                  try {
                      sblock= String.valueOf((int)hour);
                      sday = String.valueOf(day);
@@ -275,175 +308,179 @@ public class Controller extends ControllerBase {
                      System.out.println("sday: " +sday);
                      System.out.println("zonetemp string: " +String.valueOf(zoneTemps[0]));
 
-	// Call Python optimization code with necessary info - ONLY ONE SHOULD BE UNCOMMENTED
-                  // 4 hr block method - obsolete
-                     // Process p = Runtime.getRuntime().exec("python ./energyOpt.py " +sday +" "+sblock +" "+ String.valueOf(zoneTemps[0])); 
-                  // 1 timestep method
-                     Process p = Runtime.getRuntime().exec("python3 ./energyOptTset2hr.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])); 
+                    // Call Python optimization code with necessary info
+                    if (optimizeSet){
+                        Process p = Runtime.getRuntime().exec("python3 ./energyOptTset2hr.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])+ " " + String(24) + " " + timestepsToOpt + " " + heatOrCool + " " + mode + " " + dateRange); 
+                    }
+                    else{ // Call Python adaptive and occupancy setpoints code with necessary info
+                        Process p = Runtime.getRuntime().exec("python3 ./occupancyAdaptSetpoints.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])+ " " + String(24) + " " + timestepsToOpt + " " + heatOrCool + " " + mode + " " + dateRange); 
+                     }
 
-    
                      BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                     System.out.println("Here is the result");  //Currently fails after this line
-            
-            // Gets input data from Python that will either be a keystring or a variable. 
-            // AS long as there is another output line with data,
+                     System.out.println("Received from Python optimizer");          
+                
+                // Gets input data from Python that will either be a keystring or a variable. 
+                // AS long as there is another output line with data,
                      while ((s = stdInput.readLine()) != null) {
-                      	  //System.out.println("Entered input reader while loop");
-                         System.out.println(s);
-                         // Note: Brian may eventually change this to a switch-case with a default to the ifs 
-                         //       to reduce computing time
-                         // If previous line was a keystring, the assocaited boolean is true, so append data
-                         if (startSavingE == true) {
-                             dataStringOpt = dataStringOpt + separatorOpt + s;
-                             // Added print lines for debugging
-                             //System.out.println("dataStringOpt = " + dataStringOpt);
-                         }		
-                         if (startSavingT == true) {
-                             dataStringOptT = dataStringOptT + separatorOpt + s;
-                             //System.out.println("dataStringOptT = " + dataStringOptT);
-                         }
-                         if (startSavingP == true) {
-                             dataStringOptP = dataStringOptP + separatorOpt + s;
-                             //System.out.println("dataStringOptP = " + dataStringOptP);
-                         }
-                         if (startSavingO == true) {
-                             dataStringOptO = dataStringOptO + separatorOpt + s;
-                             //System.out.println("dataStringOptO = " + dataStringOptO);
-                         }
-                         if (startSavingS == true) {
-                             dataStringOptS = dataStringOptS + separatorOpt + s;
-                             //System.out.println("dataStringOptS = " + dataStringOptS);
-                         }
+                          //System.out.println("Entered input reader while loop");
+                         //System.out.println(s);
+                         // Note: Brian changed this to a switch-case with a default to the ifs 
+                         //       to reduce computing time and fix so it's not appending data meant for the next one. 
                          // If current line is a keystring, identify it by setting associated boolean to true
                          // such that next line can use it.
-                         if (s .equals("energy consumption")){
-                             startSavingE = true;
-                             //System.out.println("energy consumption - startSavingE");
-                         }
-                         if (s .equals("indoor temp prediction")){
-                             startSavingT = true;
-                             //System.out.println("indoor temp prediction - startSavingT");
-                         }
-                         if (s .equals("pricing per timestep")){
-                             startSavingP = true;
-                             //System.out.println("pricing per timestep - startSavingP");
-                         }
-                         if (s .equals("outdoor temp")){
-                             startSavingO = true;
-                             //System.out.println("outdoor temp - startSavingO");
-                         }
-                         if (s .equals("solar radiation")){
-                             startSavingS = true;
-                             //System.out.println("solar radiation - startSavingS");
-                         }
-                         // if (s .equals("Certificate of primal infeasibility found.")){
-                            
-                         // }
-                         // System.out.println(dataString);
+                         switch (s) {
+                             case "energy consumption":
+                                 startSavingE = true;
+                                 startSavingT = false;
+                                 startSavingP = false;
+                                 startSavingO = false;
+                                 startSavingS = false;
+                                 break;
+                            case "indoor temp prediction":
+                                startSavingE = false;
+                                startSavingT = true;
+                                startSavingP = false;
+                                startSavingO = false;
+                                startSavingS = false;
+                                break;
+                            case "pricing per timestep":
+                                startSavingE = false;
+                                startSavingT = false;
+                                startSavingP = true;
+                                startSavingO = false;
+                                startSavingS = false;
+                                break;
+                            case "outdoor temp":
+                                startSavingE = false;
+                                startSavingT = false;
+                                startSavingP = false;
+                                startSavingO = true;
+                                startSavingS = false;
+                                break;
+                            case: "solar radiation":
+                                startSavingE = false;
+                                startSavingT = false;
+                                startSavingP = false;
+                                startSavingO = false;
+                                startSavingS = true;
+                                break;
+                            default: // Not a keystring, so it is probably data
+                                if (startSavingE) {
+                                 dataStringOpt = dataStringOpt + separatorOpt + s;
+                                 // Added print lines for debugging
+                                 //System.out.println("dataStringOpt = " + dataStringOpt);
+                                }      
+                                else if (startSavingT) {
+                                 dataStringOptT = dataStringOptT + separatorOpt + s;
+                                 //System.out.println("dataStringOptT = " + dataStringOptT);
+                                }
+                                else if (startSavingP) {
+                                 dataStringOptP = dataStringOptP + separatorOpt + s;
+                                 //System.out.println("dataStringOptP = " + dataStringOptP);
+                                }
+                                else if (startSavingO) {
+                                 dataStringOptO = dataStringOptO + separatorOpt + s;
+                                 //System.out.println("dataStringOptO = " + dataStringOptO);
+                                }
+                                else if (startSavingS) {
+                                 dataStringOptS = dataStringOptS + separatorOpt + s;
+                                 //System.out.println("dataStringOptS = " + dataStringOptS);
+                                }
+                            } // End switch case
+                        } // End try
                      }
-                 } catch (IOException e) {
-                     e.printStackTrace();
-                 }
-                 //Convert single datastring to array of substrings deliniated by separator
-                 // Print lines only for debugging
-                 String vars[] = dataStringOpt.split(separatorOpt);
-                 //System.out.println("vars = " + vars);
-                 String varsT[] = dataStringOptT.split(separatorOpt);
-                 //System.out.println("varsT = " + varsT);
-                 String varsP[] = dataStringOptP.split(separatorOpt);
-                 //System.out.println("varsP = " + varsP);
-                 String varsO[] = dataStringOptO.split(separatorOpt);
-                 //System.out.println("varsO = " + varsO);
-                 String varsS[] = dataStringOptS.split(separatorOpt);
-                 //System.out.println("varsS = " + varsS);
-
-                 for (int in =1;in<13;in++) {
-                     futureIndoorTemp[in-1]=varsT[in];
-                 }
-
-    
-                 // Writing data to file
-                 try{
-                     // Create new file
-                    
-                     //String path="/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataCVXOPT_" + datime +".txt";
-                     //File file = new File(path);
-                     
-                     // New file naming method that goes to Deployment folder and has the time and date string - Brian
-                     // DataCVXOPT_YYYY-MM-DD_HH-mm.txt
-                     File file = new File("DataCVXOPT_"+datime+".txt");
-    
-                     // If file doesn't exists, then create it
-                     if (!file.exists()) {
-                         file.createNewFile();
+                     catch (IOException e) {
+                         e.printStackTrace();
                      }
-    
-                     FileWriter fw = new FileWriter(file.getAbsoluteFile(),true);
-                     BufferedWriter bw = new BufferedWriter(fw);
-    
-                     // Write in file
+                     //Convert single datastring to array of substrings deliniated by separator
+                     // Print lines only for debugging
+                     String vars[] = dataStringOpt.split(separatorOpt);
+                     //System.out.println("vars = " + vars);
+                     String varsT[] = dataStringOptT.split(separatorOpt);
+                     //System.out.println("varsT = " + varsT);
+                     String varsP[] = dataStringOptP.split(separatorOpt);
+                     //System.out.println("varsP = " + varsP);
+                     String varsO[] = dataStringOptO.split(separatorOpt);
+                     //System.out.println("varsO = " + varsO);
+                     String varsS[] = dataStringOptS.split(separatorOpt);
+                     //System.out.println("varsS = " + varsS);
+    /*
                      for (int in =1;in<13;in++) {
-                         bw.write(vars[in]+"\t"+varsT[in]+"\t"+varsP[in]+"\t"+varsO[in]+"\t"+varsS[in]+"\n");
+                         futureIndoorTemp[in-1]=varsT[in];
                      }
-    
-                     // Close connection
-                     bw.close();
-                 }
-                 catch(Exception e){
-                     System.out.println(e);
-                 }
-    
-                 // resetting 
-                 startSavingE = false;
-                 startSavingT = false;
-                 startSavingP = false;
-                 startSavingO = false;
-                 startSavingS = false;
-                 dataStringOpt = "";
-             }
+    */
+                     futureIndoorTemp[]=varsT[0:timestepsToOpt];
 
-             // Setting setpoint temp for next hour 
-             System.out.println("determine setpoints loop1");
-             if (hour%1 == 0){
-                 p=0;
-                 System.out.println("p"+String.valueOf(p));
-             }
-             // heatTemps[0]=Double.parseDouble(futureIndoorTemp[p]);
-             // heatTempFromOpt[0]=Double.parseDouble(futureIndoorTemp[p]);
-             // System.out.println("heatTemp"+String.valueOf(heatTemps[0]));
-             // coolTemps[0]=30.2;
-             // System.out.println("coolTemp: "+String.valueOf(coolTemps[0]));
-             // p=p+1;
-             // System.out.println("p"+String.valueOf(p));
-
-
-             // For Cooling & change heat/coolTempfromOpt in data file write below
-             coolTemps[0]=Double.parseDouble(futureIndoorTemp[p]);
-             coolTempFromOpt[0]=Double.parseDouble(futureIndoorTemp[p]);
-             System.out.println("heatTemp"+String.valueOf(coolTemps[0]));
-             heatTemps[0]=18.9;
-             System.out.println("coolTemp: "+String.valueOf(heatTemps[0]));
-             p=p+1;
-             System.out.println("p"+String.valueOf(p));
-            
-           //-------------------------------------------------------------------------------------------------
-           // Now figure out all stuff that needs to be sent to socket...
+                     // Writing data to file _____________________________________________
+                     try{
+                         // Create new file
+                         // New file naming method that goes to Deployment folder and has the time and date string - Brian
+                         // DataCVXOPT_mode_heatorcool_YYYY-MM-DD_HH-mm.txt
+                         File file = new File("DataCVXOPT_"+mode+"_"+heatOrCool+"_"+datime+".txt");
         
-           // determine heating and cooling setpoints for each simID
-           // will eventually change this part for transactive energy
-           System.out.println("determine setpoints loop2");
+                         // If file doesn't exists, then create it
+                         if (!file.exists()) {
+                             file.createNewFile();
+                         }
+        
+                         FileWriter fw = new FileWriter(file.getAbsoluteFile(),true);
+                         BufferedWriter bw = new BufferedWriter(fw);
+        
+                         // Write in file
+                         for (int in =1;in<13;in++) {
+                             bw.write(vars[in]+"\t"+varsT[in]+"\t"+varsP[in]+"\t"+varsO[in]+"\t"+varsS[in]+"\n");
+                         }
+        
+                         // Close and save file
+                         bw.close();
+                     }
+                     catch(Exception e){
+                         System.out.println(e);
+                     } // End DataCVXOPT file ----------------------------------------
+        
+                    // resetting 
+                    startSavingE = false;
+                    startSavingT = false;
+                    startSavingP = false;
+                    startSavingO = false;
+                    startSavingS = false;
+                    dataStringOpt = "";
+
+                    // Setting setpoint temp for next hour 
+                    //System.out.println("determine setpoints loop1");
+                    p=0;
+                    System.out.println("p"+String.valueOf(p));
+                }
+
+                    if(heatorcool == 'heat'){
+                        heatTemps[0]=Double.parseDouble(futureIndoorTemp[p]);
+                        heatTempFromOpt[0]=Double.parseDouble(futureIndoorTemp[p]);
+                        System.out.println("heatTemp: "+String.valueOf(heatTemps[0]));
+                        coolTemps[0]=32.0; //Setback to prevent AC activation
+                    }
+                    else{
+                        // For Cooling & change heat/coolTempfromOpt in data file write below
+                        coolTemps[0]=Double.parseDouble(futureIndoorTemp[p]);
+                        coolTempFromOpt[0]=Double.parseDouble(futureIndoorTemp[p]);
+                        System.out.println("coolTemp: "+String.valueOf(coolTemps[0]));
+                        heatTemps[0]=12.0; //Setback to prevent heater activation
+                    }
+                    p=p+1;
+                    System.out.println("p"+String.valueOf(p));
+                
+               //-------------------------------------------------------------------------------------------------
+               // Now figure out all stuff that needs to be sent to socket...
+            
+               // determine heating and cooling setpoints for each simID
+               // will eventually change this part for transactive energy
+               //System.out.println("determine setpoints loop2");
 
              // Fuzzy control
+             double max_cool_temp, min_heat_temp; 
+             double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
              for(int i=0;i<numSockets;i++){
-                 double max_cool_temp = 30.2; 
-                 double min_heat_temp = 18.9; 
-                 double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
-
-                 // I think if we set these as a band 
-                 heatTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])-0.5;
-                 coolTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])+0.5;
-
                  // Determine minimum and maximum temperatures allowed (we can probably print this from optimization code too)
+                 // Could we instead get it from optimization or occupancy output as 'heating setpoint bounds' and 'cooling setpoint bounds'?
                  if (outTemps[i]<=10){
                      min_heat_temp =18.9;
                      max_cool_temp =22.9;
@@ -455,23 +492,30 @@ public class Controller extends ControllerBase {
                      max_cool_temp = 0.31*outTemps[i] + 17.8+2;
                  }
 
-                 // Now set maximum cool and minimum heats:
+                 // Suspicious that this bit is doing something weird
+                 // Set these as a band? 
+                 heatTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])-0.5;
+                 coolTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])+0.5;
+          
+                 // Now set maximum cool and minimum heats: //PROBLEM: This could undo the occupancy vacant setback points
                  if (coolTemps[i]>=max_cool_temp){
                      coolTemps[i]=max_cool_temp;
-                     }
+                 }
                  if (heatTemps[i]<=min_heat_temp){
                      heatTemps[i]=min_heat_temp;
-                     }
+                 }
 
                  // For Cooling 1 degree under Cooling setpoint:
-                 if (zoneTemps[i] >= coolTemps[i]-.1){ // first check if going to exit maximum band
-                     fuzzy_cool = -1;
-                 } else if (zoneTemps[i] <= coolTemps[i]-1.1){
-                     fuzzy_cool = 1;
-                 }
-                 coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
-                 coolTemps[i] = 30.2; // UNCOMMENT IF HEATING for now to avoid turning on AC
-
+                 if (heatorcool == 'cool'){
+                     if (zoneTemps[i] >= coolTemps[i]-.1){ // first check if going to exit maximum band
+                         fuzzy_cool = -1;
+                     } else if (zoneTemps[i] <= coolTemps[i]-1.1){
+                         fuzzy_cool = 1;
+                     }
+                     coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
+                     heatTemps[i] = 12.0; // IF COOLING for now to avoid turning on heat
+                }
+                else{ // Heating
                  // For Heating 1 degree under Heating setpoint:
                  if (zoneTemps[i] <= heatTemps[i]+.1){ // first check if going to exit minimum band
                      fuzzy_heat = 1;
@@ -479,44 +523,17 @@ public class Controller extends ControllerBase {
                      fuzzy_heat = -1;
                  }
                  heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
-//                 heatTemps[i] = 15.0; // UNCOMMENT IF COOLING for now to avoid turning on heat
-             }   // _______________________________________________________________________ 
-//END COMMENT FOR NO OPT
-        
-/*        // Some kind of fuzzy control probably for optimization version or an older one -- brian
-	//comment out if unused
-           int Fuzzycool=0;
-           int Fuzzyheat=0;
-           // 0.5 degree fuzzy control (this oscillates indoor temp)
-           double offset=0.6;
-           if (zoneTemps[0]>=coolTemps[0]-0.5+offset){
-               Fuzzyheat = -1;
-               Fuzzycool = -1;
-           }
-           else if (zoneTemps[0]>=coolTemps[0]-0.5-offset){
-               Fuzzyheat = -1;
-           }
-           else if (zoneTemps[0]>=heatTemps[0]+0.5+offset){
-               Fuzzyheat = -1;
-               Fuzzycool = 1;
-           }
-           else if (zoneTemps[0]>=heatTemps[0]-0.5-offset){
-               Fuzzycool = 1;
-           }
-           else{
-               Fuzzyheat = 1;
-               Fuzzycool = 1;
-           }
-           coolTemps[0] = coolTemps[0] - 0.5 + Fuzzycool*offset;
-           heatTemps[0] = heatTemps[0] + 0.5 + Fuzzyheat*offset;
-*/	// ---------------- end fuzzy
-	
+                 coolTemps[i] = 32.0; // IF HEATING for now to avoid turning on AC
+                }
+             }   
+//END OPTIMIZATION or OCCUPANCY --------------------------------------------------------------
+    
           System.out.println("heatTemps[0] = "+heatTemps[0] );
           System.out.println("coolTemps[0] = "+coolTemps[0] );
           
-	} // end giant if to determine if Optimized
-	else{
-	// This block of code is not used anymore
+    } // end giant if to determine if Optimized
+    else{
+    // This block of code is not used anymore
         //   // use the following loop to solve for heating/cooling setpts for each EnergyPlus simulation
         //   // if you only have one EnergyPlus simulation still use the loop so that it is easy to add more
         //   // currently, adaptive setpoint control is implemented with 0.5 "fuzzy control"
@@ -527,13 +544,12 @@ public class Controller extends ControllerBase {
         //     // zoneRHs[i] can add this but need to check FMU file and also edit socket.java
 
 // Adaptive Setpoint Control: _______________________________________________________________________
-	if (adaptiveSet){
-		System.out.println("Adaptive only ERROR");
-	// COMMENT OUT For all others
+    if (adaptiveSet){
+        System.out.println("Adaptive only ERROR");
+    // COMMENT OUT For all others
             // Sets to a the minimum of 18.9 when outdoor temp outTemps < 10C, and max 30.2C when outTemps >= 33.5
             // Uses sliding scale for 10 < outTemps < 33.5 C
             // Note if temperature is consistently above 33.5C or below 10C no changes in setpoint will occur.
-            
             if (outTemps[0]<=10){
               heatTemps[0]=18.9;
               coolTemps[0]=22.9;
@@ -545,100 +561,84 @@ public class Controller extends ControllerBase {
               coolTemps[0] = 0.31*outTemps[0] + 17.8+2+0.5;
             }
 
-	//COMMENT OUT coolTemps if cooling OR heatTemps if heating. Do NOT remove both!
-             coolTemps[0]= 30.2;     // 23.0
-//             heatTemps[0] = 15.0;   // 20.0 
-          
-// End Adaptive Setpoint Control __________________________________________________________
-	}
-// FIXED SETPOINT
-	else{ //Not adaptive, so fixed
-		System.out.println("Fixed Setpoint - ERROR");
-	//COMMENT OUT IF ADAPTIVE OR EITHER OPTIMIZATION CASE!
-             coolTemps[0]= 30.2; //23.0 if cooling, 30.2 if not
-             heatTemps[0] = 20.0; //20.0 if heating, 15.0 if not
-   //END FIXED SETPT
+            if(heatorcool == 'heat'){
+                coolTemps[0]= 30.2;     // 23.0
+            }
+            else{
+                heatTemps[0] = 15.0;   // 20.0 
+            }
+    }          
+// End Adaptive Setpoint Control -------------------------------------------------------
 
-	}
-/*
-// Unknown - old fuzzy? ______________________________________________________________
-                  for(int i=0;i<numSockets;i++){
-                     double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
-    
-                // For Cooling 1 degree under Cooling setpoint:
-                     if (zoneTemps[i] >= coolTemps[i]-.1){
-                     fuzzy_cool = -1;
-                     } else if (zoneTemps[i] <= coolTemps[i]-1.1){
-                         fuzzy_cool = +1;
-                     }
-                     coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
-                    
-                    
-                // For Heating 1 degree under Heating setpoint:
-                     if (zoneTemps[i] >= heatTemps[i]+1.1){
-                         fuzzy_heat = -1;
-                     } else if (zoneTemps[i] <= heatTemps[i]+.1){
-                         fuzzy_heat = +1;
-                     }
-                     heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
-                 }   
-// _______________________________________________________________________
-*/
+// FIXED SETPOINT _________________________________________________________________________
+    else{ //Not adaptive, so fixed
+        if(heatorcool == 'heat'){
+            coolTemps[0] = 30.2;
+            heatTemps[0] = 20.0;
+        }
+        else if(heatorcool == 'cool'){
+             coolTemps[0]= 23.0; //23.0 if cooling, 30.2 if not
+             heatTemps[0] = 15.0; //20.0 if heating, 15.0 if not
+        }
+    }
+//END FIXED SETPT -------------------------------------------------------------------
 
-//FUZZY CONTROL FOR NO OPTIMIZATION
-// COMMENT OUT IF USING OPTIMIZATION
 
-            // Fuzzy control added for testing 5/16 without optimization
-            for(int i=0;i<numSockets;i++){
-              double max_cool_temp = 30.2; 
-              double min_heat_temp = 18.9; 
-              double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
+//FUZZY CONTROL FOR NO OPTIMIZATION ______________________________________________________
+// Does not activate IF USING OPTIMIZATION
+    for(int i=0;i<numSockets;i++){
+          double max_cool_temp = 30.2; 
+          double min_heat_temp = 18.9; 
+          double OFFSET = 0.6; // need to change slightly higher/lower so E+ doesnt have issues
 
-              // // I think if we set these as a band 
-              // heatTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])-0.5;
-              // coolTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])+0.5;
+          // // I think if we set these as a band 
+          // heatTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])-0.5;
+          // coolTemps[i]=Double.parseDouble(futureIndoorTemp[p-1])+0.5;
 
-              // Determine minimum and maximum temperatures allowed (we can probably print this from optimization code too)
-              if (outTemps[i]<=10){
-                  min_heat_temp =18.9;
-                  max_cool_temp =22.9;
-              }else if (outTemps[i]>=33.5){
-                  min_heat_temp =26.2;
-                  max_cool_temp =30.2;
-              }else {
-                  min_heat_temp = 0.31*outTemps[i] + 17.8-2;
-                  max_cool_temp = 0.31*outTemps[i] + 17.8+2;
-              }
-
-              // Now set maximum cool and minimum heats:
-              if (coolTemps[i]>=max_cool_temp){
-                  coolTemps[i]=max_cool_temp;
-                  }
-              if (heatTemps[i]<=min_heat_temp){
-                  heatTemps[i]=min_heat_temp;
-                  }
-
-              // For Cooling 1 degree under Cooling setpoint:
-              if (zoneTemps[i] >= coolTemps[i]-.1){ // first check if going to exit maximum band
-                  fuzzy_cool = -1;
-              } else if (zoneTemps[i] <= coolTemps[i]-1.1){
-                  fuzzy_cool = 1;
-              }
-              coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
-              coolTemps[i] = 30.2; // Override for now to avoid turning on AC. COMMENT OUT IF COOLING!
-
-              // For Heating 1 degree under Heating setpoint:
-              if (zoneTemps[i] <= heatTemps[i]+.1){ // first check if going to exit minimum band
-                  fuzzy_heat = 1;
-              } else if (zoneTemps[i] >= heatTemps[i]+1.1){
-                  fuzzy_heat = -1;
-              }
-              heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
-//              heatTemps[i] = 15.0; // Override for now to avoid turning on heat. COMMENT OUT IF HEATING!
+          // Determine minimum and maximum temperatures allowed (we can probably print this from optimization code too)
+          if (outTemps[i]<=10){
+              min_heat_temp =18.9;
+              max_cool_temp =22.9;
+          }else if (outTemps[i]>=33.5){
+              min_heat_temp =26.2;
+              max_cool_temp =30.2;
+          }else {
+              min_heat_temp = 0.31*outTemps[i] + 17.8-2;
+              max_cool_temp = 0.31*outTemps[i] + 17.8+2;
           }
-          
-// END FUZZY NO OPT
-	} // end of giant else to indicate not optimized
+
+          // Now set maximum cool and minimum heats:
+          if (coolTemps[i]>=max_cool_temp){
+              coolTemps[i]=max_cool_temp;
+              }
+          if (heatTemps[i]<=min_heat_temp){
+              heatTemps[i]=min_heat_temp;
+              }
+
+        if (heatorcool == 'cool'){
+          // For Cooling 1 degree under Cooling setpoint:
+          if (zoneTemps[i] >= coolTemps[i]-.1){ // first check if going to exit maximum band
+              fuzzy_cool = -1;
+          } else if (zoneTemps[i] <= coolTemps[i]-1.1){
+              fuzzy_cool = 1;
+          }
+          coolTemps[i] = coolTemps[i] - 0.6 +fuzzy_cool*OFFSET;   // -0.6 so that oscillates 0.1-1.1 degree under cooling setpoint
+          heatTemps[i] = 15.0; // Override for now to avoid turning on AC. 
+        }
+        else{ //Heat
+          // For Heating 1 degree under Heating setpoint:
+          if (zoneTemps[i] <= heatTemps[i]+.1){ // first check if going to exit minimum band
+              fuzzy_heat = 1;
+          } else if (zoneTemps[i] >= heatTemps[i]+1.1){
+              fuzzy_heat = -1;
+          }
+          heatTemps[i] = heatTemps[i] + 0.6 +fuzzy_heat*OFFSET;  // +0.6 so that oscillates 0.1-1.1 degree above heating setpoint
+          coolTemps[i] = 32.0; // Override for now to avoid turning on heat. 
+          }
+      }
+// END FUZZY NO OPT ------------------------------------------------------------
+
+} // end of giant else to indicate not optimized
 
           // Send values to each socket federate
           System.out.println("send to sockets interactions loop");
@@ -674,20 +674,12 @@ public class Controller extends ControllerBase {
           System.out.println("timestep after sending Socket... should advance after this: "+ currentTime);
 
 
-
-            // System.out.println(currentTime);
-            // System.out.println(dataString);
-
-            // Writing data to file
+            // Writing data to file ______________________________________________________
             try{
-                // Create new file ---------------------------------- CHANGE PATH ON NEW COMPUTER! (not needed anymore)
-                
-                //String path="/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_deployment/DataEP_"+datime+".txt";
-                //File file = new File(path);
-                
+                // Create new file
                 // New file naming method that goes to Deployment folder and has the time and date string - Brian
                 // DataEP_YYYY-MM-DD_HH-mm.txt
-                File file = new File("DataEP_"+datime+".txt");
+                File file = new File("DataEP_"+mode+"_"+heatOrCool+"_"+datime+".txt");
 
                 // If file doesn't exists, then create it
                 if (!file.exists()) {
@@ -706,8 +698,6 @@ public class Controller extends ControllerBase {
             catch(Exception e){
                 System.out.println(e);
             }
-
-
 
             ////////////////////////////////////////////////////////////////////
             // TODO break here if ready to resign and break out of while loop //
@@ -731,6 +721,7 @@ public class Controller extends ControllerBase {
         //////////////////////////////////////////////////////////////////////
     }
 
+// This method is what controller does with the data sent from Socket.java
     private void handleInteractionClass(Socket_Controller interaction) {
         ///////////////////////////////////////////////////////////////
         // TODO implement how to handle reception of the interaction //
@@ -744,7 +735,7 @@ public class Controller extends ControllerBase {
         // int simID = 0;
         int simID = interaction.get_simID();
         System.out.println("numVars[simID] = " + numVars[simID]);
-    	holder[simID] = interaction.get_dataString();
+        holder[simID] = interaction.get_dataString();
         System.out.println("holder[simID] = "+ holder[simID] );
 
         System.out.println("handle interaction loop");
@@ -817,6 +808,7 @@ public class Controller extends ControllerBase {
       
     }
 
+// Automatically created method; don't change without a good reason
     public static void main(String[] args) {
         try {
             FederateConfigParser federateConfigParser =
