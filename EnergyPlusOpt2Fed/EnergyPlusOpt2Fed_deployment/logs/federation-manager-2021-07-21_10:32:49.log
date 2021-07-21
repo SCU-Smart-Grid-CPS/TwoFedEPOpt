@@ -1,0 +1,123 @@
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/usr/share/maven/lib/guice.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------< [0;36morg.webgme.guest:EnergyPlusOpt2Fed_exec[0;1m >---------------[m
+[[1;34mINFO[m] [1mBuilding EnergyPlusOpt2Fed_exec 0.1.0-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+Downloading from archiva.snapshots: http://cpswtng_archiva:8080/repository/snapshots/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+Downloading from archiva.internal: http://cpswtng_archiva:8080/repository/internal/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;33mWARNING[m] Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Transfer failed for http://cpswtng_archiva:8080/repository/internal/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;33mWARNING[m] Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.snapshots (http://cpswtng_archiva:8080/repository/snapshots/): Transfer failed for http://cpswtng_archiva:8080/repository/snapshots/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;33mWARNING[m] Failure to transfer org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from http://cpswtng_archiva:8080/repository/internal/ was cached in the local repository, resolution will not be reattempted until the update interval of archiva.internal has elapsed or updates are forced. Original error: Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Transfer failed for http://cpswtng_archiva:8080/repository/internal/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;33mWARNING[m] Failure to transfer org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from http://cpswtng_archiva:8080/repository/snapshots/ was cached in the local repository, resolution will not be reattempted until the update interval of archiva.snapshots has elapsed or updates are forced. Original error: Could not transfer metadata org.cpswt:fedmanager-host:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.snapshots (http://cpswtng_archiva:8080/repository/snapshots/): Transfer failed for http://cpswtng_archiva:8080/repository/snapshots/org/cpswt/fedmanager-host/0.6.0-SNAPSHOT/maven-metadata.xml
+Downloading from archiva.internal: http://cpswtng_archiva:8080/repository/internal/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+Downloading from archiva.snapshots: http://cpswtng_archiva:8080/repository/snapshots/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;33mWARNING[m] Could not transfer metadata org.cpswt:cpswt-core:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.internal (http://cpswtng_archiva:8080/repository/internal/): Transfer failed for http://cpswtng_archiva:8080/repository/internal/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;33mWARNING[m] Could not transfer metadata org.cpswt:cpswt-core:0.6.0-SNAPSHOT/maven-metadata.xml from/to archiva.snapshots (http://cpswtng_archiva:8080/repository/snapshots/): Transfer failed for http://cpswtng_archiva:8080/repository/snapshots/org/cpswt/cpswt-core/0.6.0-SNAPSHOT/maven-metadata.xml
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mexec-maven-plugin:1.5.0:java[m [1m(default-cli)[m @ [36mEnergyPlusOpt2Fed_exec[0;1m ---[m
+10:32:53.967 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA definitions were provided!
+10:32:53.970 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COA selections were provided!
+10:32:53.971 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No specific COA-selection was specified for execution!
+10:32:53.972 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.hla.FederationManager - No COAs are used in this experiment.
+
+-------------------------------------------------------------------
+GMS: address=vagrant-virtual-machine-41117, cluster=EnergyPlusOpt2Fed1, physical address=10.16.130.151:35130
+-------------------------------------------------------------------
+ERROR [org.cpswt.host.FederationManagerHostApp.main()] portico.lrc.jgroups: FAILURE createFederation: already exists, name=EnergyPlusOpt2Fed1
+ERROR [org.cpswt.host.FederationManagerHostApp.main()] portico.lrc: federation exists: EnergyPlusOpt2Fed1
+org.portico.lrc.compat.JFederationExecutionAlreadyExists: federation exists: EnergyPlusOpt2Fed1
+	at org.portico.bindings.jgroups.Federation.sendCreateFederation(Federation.java:222)
+	at org.portico.bindings.jgroups.JGroupsConnection.createFederation(JGroupsConnection.java:218)
+	at org.portico.lrc.services.federation.handlers.outgoing.CreateFederationHandler.process(CreateFederationHandler.java:87)
+	at org.portico.utils.messaging.MessageSink.process(MessageSink.java:187)
+	at org.portico.impl.hla13.Impl13Helper.processMessage(Impl13Helper.java:123)
+	at org.portico.impl.hla13.Rti13Ambassador.processMessage(Rti13Ambassador.java:5822)
+	at org.portico.impl.hla13.Rti13Ambassador.createFederationExecution(Rti13Ambassador.java:194)
+	at org.cpswt.hla.FederationManager.initializeLRC(FederationManager.java:372)
+	at org.cpswt.hla.FederationManager.<init>(FederationManager.java:300)
+	at org.cpswt.host.FederationManagerHostApp.initFederationManager(FederationManagerHostApp.java:71)
+	at org.cpswt.host.FederationManagerHostApp.main(FederationManagerHostApp.java:198)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:567)
+	at org.codehaus.mojo.exec.ExecJavaMojo$1.run(ExecJavaMojo.java:294)
+	at java.base/java.lang.Thread.run(Thread.java:830)
+10:32:56.466 [org.cpswt.host.FederationManagerHostApp.main()] ERROR org.cpswt.hla.FederationManager - Federation with the name of "EnergyPlusOpt2Fed1" already exists.
+10:32:57.066 [org.cpswt.host.FederationManagerHostApp.main()] INFO  org.cpswt.host.FederationManagerHostApp - Server online at 0.0.0.0:8083 ...
+10:33:00.201 [Thread-1] ERROR org.cpswt.hla.ObjectRoot - could not initialize: Federate Not Execution Member
+hla.rti.FederateNotExecutionMember: 
+	at org.portico.impl.hla13.Impl13Helper.checkJoined(Impl13Helper.java:272) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.impl.hla13.Rti13Ambassador.getObjectClassHandle(Rti13Ambassador.java:5276) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.ObjectRoot.init(ObjectRoot.java:256) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederateObject.init(FederateObject.java:142) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:287) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+10:33:00.305 [Thread-1] ERROR org.cpswt.hla.FederateObject - could not initialize: Federate Not Execution Member
+hla.rti.FederateNotExecutionMember: 
+	at org.portico.impl.hla13.Impl13Helper.checkJoined(Impl13Helper.java:272) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.impl.hla13.Rti13Ambassador.getObjectClassHandle(Rti13Ambassador.java:5276) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederateObject.init(FederateObject.java:147) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:287) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+10:33:00.306 [Thread-1] ERROR org.cpswt.hla.FederateObject - could not subscribe to "FederateType" attribute.
+java.lang.NullPointerException: null
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:292) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+10:33:00.306 [Thread-1] ERROR org.cpswt.hla.FederateObject - could not subscribe to "FederateHandle" attribute.
+java.lang.NullPointerException: null
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:292) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+10:33:00.307 [Thread-1] ERROR org.cpswt.hla.FederateObject - could not subscribe to "FederateHost" attribute.
+java.lang.NullPointerException: null
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:292) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+ERROR [Thread-1] portico.lrc: 
+org.portico.lrc.compat.JFederateNotExecutionMember: 
+	at org.portico.lrc.LRCState.checkJoined(LRCState.java:427)
+	at org.portico.lrc.services.pubsub.handlers.outgoing.SubscribeObjectClassHandler.process(SubscribeObjectClassHandler.java:60)
+	at org.portico.utils.messaging.MessageSink.process(MessageSink.java:187)
+	at org.portico.impl.hla13.Impl13Helper.processMessage(Impl13Helper.java:123)
+	at org.portico.impl.hla13.Rti13Ambassador.processMessage(Rti13Ambassador.java:5822)
+	at org.portico.impl.hla13.Rti13Ambassador.subscribeObjectClassAttributes(Rti13Ambassador.java:1366)
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:303)
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592)
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439)
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697)
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167)
+10:33:00.339 [Thread-1] ERROR org.cpswt.hla.FederateObject - could not subscribe: Federate Not Execution Member
+hla.rti.FederateNotExecutionMember: org.portico.lrc.compat.JFederateNotExecutionMember: 
+	at org.portico.impl.hla13.Rti13Ambassador.subscribeObjectClassAttributes(Rti13Ambassador.java:1396) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederateObject.subscribe(FederateObject.java:303) [Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.waitExpectedFederatesToJoin(FederationManager.java:592) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startFederationRun(FederationManager.java:439) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.hla.FederationManager.startSimulation(FederationManager.java:697) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+	at org.cpswt.host.FederationManagerHostApp$1.run(FederationManagerHostApp.java:167) [fedmanager-host-0.6.0-SNAPSHOT.jar:?]
+Caused by: org.portico.lrc.compat.JFederateNotExecutionMember: 
+	at org.portico.lrc.LRCState.checkJoined(LRCState.java:427) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.lrc.services.pubsub.handlers.outgoing.SubscribeObjectClassHandler.process(SubscribeObjectClassHandler.java:60) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.utils.messaging.MessageSink.process(MessageSink.java:187) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.impl.hla13.Impl13Helper.processMessage(Impl13Helper.java:123) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.impl.hla13.Rti13Ambassador.processMessage(Rti13Ambassador.java:5822) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	at org.portico.impl.hla13.Rti13Ambassador.subscribeObjectClassAttributes(Rti13Ambassador.java:1366) ~[Controller-0.1.0-SNAPSHOT.jar:?]
+	... 5 more
