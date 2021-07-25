@@ -1,9 +1,13 @@
 /*
 File:		Socket.java
+Project:	EnergyPlusOptOcc2Fed
 Author(s):	PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-Last Updated:	2021-06-22
-Notes:		Current file paths match the runUCEF* series of VMs on the cluster
+Version:        5.0
+Last Updated:	2021-07-25
+Notes:		File paths should work as long as the main project folder is intact.
 Run:		Need to change file paths in this code. Then build or build-all. Run as part of federation.
+Changelog:
+* config.txt file path is now universal. It is located in the deployment folder instead.
 */
 
 package org.webgme.guest.socket;
@@ -29,8 +33,6 @@ public class Socket extends SocketBase {
     private final static Logger log = LogManager.getLogger();
 
     private double currentTime = 0;
-
-    // Kaleb // Config stuff TODO
     // START WITH simID as ZERO because java is zero indexed
     int simID = 0;   // Change simID based on socket number
 
@@ -43,7 +45,7 @@ public class Socket extends SocketBase {
     String eGSH=null, eGSC=null, ePeople=null;  //values sent to EnergyPlus
     boolean empty=true;
     boolean receivedSimTime = false;    // this is for "received" interaction while loop
-    // Kaleb //
+    int waitTime = 0;
 
     public Socket(FederateConfig params) throws Exception {
         super(params);
@@ -72,40 +74,38 @@ public class Socket extends SocketBase {
         // TODO perform basic initialization below //
         /////////////////////////////////////////////
 
-        // Read IP address and Port number from config.txt 
-        log.info("create bufferedReader");
-        File file= new File("/home/vagrant/Desktop/EnergyPlusOpt2Fed/EnergyPlusOpt2Fed_generated/config.txt");
+        // Read IP address and Port number from config.txt _____________
+        log.info("Getting Configuration Settings: ");
+        File file= new File("config.txt"); // In deployment folder
         BufferedReader br = new BufferedReader(new FileReader(file));
-        log.info("bufferedreader successful");
         String st = "";
         String ipAdd = "";
         int portNo = 0;
-        while ((st = br.readLine())!=null){
+        while ((st = br.readLine())!=null && (ipAdd.equals("") || portNo == 0)){
             log.info(st);
-            if(st.equals("ip_adress:")){
+            if(st.contains("ip_address:")){
                 ipAdd = br.readLine();
             }
-            if(st.equals("port_number:")){
+            if(st.contains("port_number:")){
                 portNo = Integer.valueOf(br.readLine());
             }
         }
-        log.info(ipAdd);
-        log.info(portNo);
+        log.info("IP Address: " + ipAdd);
+        log.info("Port Number: " + portNo);
         
         log.info("Waiting for EnergyPlus simulations to join...");
-        // end test config.txt
+        // end config.txt -------------------------------------------------
 
-        // Kaleb // Add socket here: 
+        // Kaleb // Add socket here: _________________________________________________
         InetAddress addr = InetAddress.getByName(ipAdd);  // the address needs to be changed in config.txt
         ServerSocket welcomeSocket = new ServerSocket(portNo, 50, addr);  // Can also be changed in config.txt
         java.net.Socket connectionSocket = welcomeSocket.accept(); // initial connection will be made at this point
-        System.out.println("connection successful");
         log.info("connection successful");
      
         InputStreamReader inFromClient = new InputStreamReader(connectionSocket.getInputStream());
         BufferedReader buffDummy = new BufferedReader(inFromClient);
         DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-        // Kaleb // end socket
+        // done adding socket ---------------------------------------------------------
 
         AdvanceTimeRequest atr = new AdvanceTimeRequest(currentTime);
         putAdvanceTimeRequest(atr);
@@ -155,7 +155,7 @@ public class Socket extends SocketBase {
             //    vSocket_Controller.set_sourceFed( < YOUR VALUE HERE > );
             //    vSocket_Controller.sendInteraction(getLRC(), currentTime + getLookAhead());
 
-            // Kaleb // Getting values from  fmu
+            // Get values from FMU - Kaleb __________________________________________
             if((header = buffDummy.readLine()).equals("TERMINATE")){
             	exitCondition = true;
             }
@@ -218,6 +218,7 @@ public class Socket extends SocketBase {
               	  	dataString = dataString +value+doubleSeparater;  
                 }
             }
+            // End FMU Receive -----------------------------------------------------
             // for checking timestep
             dataString = dataString+"timestep"+varNameSeparater+String.valueOf(currentTime)+doubleSeparater;
 
@@ -228,7 +229,8 @@ public class Socket extends SocketBase {
             log.info("Sent sendEPData interaction from socket{} with {}", simID , dataString);
             sendEPData.sendInteraction(getLRC());
 
-            // Wait to receive Controller_Socket information containing setpoints that will be sent to eplus
+            // Wait to receive Controller_Socket information containing setpoints that will be sent to EP
+            // Prevents timesteps from elapsing in between __________________________________________________
             while (!receivedSimTime){
                 log.info("waiting to receive SimTime...");
                 synchronized(lrc){
@@ -236,11 +238,16 @@ public class Socket extends SocketBase {
                 }
                 checkReceivedSubscriptions();
                 if(!receivedSimTime){
-                    CpswtUtils.sleep(100);
+                    CpswtUtils.sleep(100+ waitTime);
+                    waitTime++;
+                    if (waitTime > 500){
+                        System.out.println("Controller won't answer my calls! Oh well... [Hangs up.]");
+                        System.exit(1);
+                    }
                 }
             }
             receivedSimTime = false;
-            // 
+            //  End timestep workaround -------------------------------------------------------------------
 
             // Empty Data String for next time step
             dataString = "";
@@ -256,28 +263,10 @@ public class Socket extends SocketBase {
             outToClient.flush();
             
             // Kaleb //
-            
             // ReceiveModel vReceiveModel = create_ReceiveModel();
             // vReceiveModel.set_dataString(dataString);
             // log.info("Sent receiveModel interaction with {}",  dataString);
-            
             // vReceiveModel.sendInteraction(getLRC());
-
-            // // removing time delay...
-            // while (!receivedSimTime){
-            //     log.info("waiting to receive SimTime...");
-            //     synchronized(lrc){
-            //         lrc.tick();
-            //     } 
-            //     checkReceivedSubscriptions();
-            //     if(!receivedSimTime){
-            //         CpswtUtils.sleep(1000);
-            //     }
-            // }
-            // receivedSimTime = false;
-            // // ...........
-
-            // System.out.println(currentTime);
 
             ////////////////////////////////////////////////////////////////////
             // TODO break here if ready to resign and break out of while loop //
@@ -301,6 +290,7 @@ public class Socket extends SocketBase {
         //////////////////////////////////////////////////////////////////////
     }
 
+// What to do with data sent from controller
     private void handleInteractionClass(Controller_Socket interaction) {
         ///////////////////////////////////////////////////////////////
         // TODO implement how to handle reception of the interaction //
@@ -335,28 +325,29 @@ public class Socket extends SocketBase {
                 j = j+1;
             }
 
-    		for(int i =0; i<j; i++){
-	        	System.out.println("ReceivedData interaction " + varNames[i] + " as " + doubles[i]);
-                // if you are receiving something else besides variables listed below, add another if()
-	        	if(varNames[i].equals("epGetStartHeating")){
-	        		eGSH = doubles[i];
-	        		System.out.println("Received Heating setpoint as" + varNames[i] + eGSH);
-	        		log.info("Received Heating setpoint as {} = {}" , varNames[i] , eGSH);
-	        	}
-	        	if(varNames[i].equals("epGetStartCooling")){
-	        		eGSC = doubles[i];
-	        		System.out.println("Received Cooling setpoint as" + varNames[i] + eGSC);
-	        		log.info("Received Cooling setpoint as {} = {}" , varNames[i] , eGSC);
-	        	}
-	        	if(varNames[i].equals("epGetPeople")){
-	        		ePeople = doubles[i];
-	        		System.out.println("Received People as" + varNames[i] + ePeople);
-	        		log.info("Received People as {} = {}" , varNames[i] , ePeople);
-	        	}
-    		}
+		//Variables that can be sent by Controller ______________________________________
+		// Not required to send all the ones listed here.
+		for(int i =0; i<j; i++){
+			System.out.println("ReceivedData interaction " + varNames[i] + " as " + doubles[i]);
+		// if you are receiving something else besides variables listed below, add another if()
+			if(varNames[i].equals("epGetStartHeating")){
+				eGSH = doubles[i];
+				System.out.println("Received Heating setpoint as" + varNames[i] + eGSH);
+				log.info("Received Heating setpoint as {} = {}" , varNames[i] , eGSH);
+			}
+			if(varNames[i].equals("epGetStartCooling")){
+				eGSC = doubles[i];
+				System.out.println("Received Cooling setpoint as" + varNames[i] + eGSC);
+				log.info("Received Cooling setpoint as {} = {}" , varNames[i] , eGSC);
+			}
+			if(varNames[i].equals("epGetPeople")){
+				ePeople = doubles[i];
+				System.out.println("Received People as" + varNames[i] + ePeople);
+				log.info("Received People as {} = {}" , varNames[i] , ePeople);
+			}
+		} // ---------------------------------------------------------------------
     	}
     	// Kaleb // 
-
     }
 
     public static void main(String[] args) {
