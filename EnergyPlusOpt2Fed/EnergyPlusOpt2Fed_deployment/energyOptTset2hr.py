@@ -1,7 +1,7 @@
 # energyOptTset2hr.py
 # Author(s):    PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-# Version:      4.4
-# Last Updated: 2021-07-15
+# Version:      5.0
+# Last Updated: 2021-07-25
 # Changelog:
 # - Added switching for adaptive vs fixed vs occupancy control - Brian
 # - Added occupancy optimization - Brian
@@ -26,7 +26,6 @@ import time
 import pandas as pd
 import numpy as np
 import sys
-import datetime as datetime
 from scipy.stats import norm
 
 # IMPORTANT PARAMETERS TO CHANGE ------------------------------------------------
@@ -36,8 +35,10 @@ from scipy.stats import norm
 # Options: 
 #   'Jan1thru7'
 #   'Feb12thru19'
-#   'Sept27thruOct3'
+#   'Sep27-Oct3_SJ'
 #   'July1thru7'
+#   'SummerSJ'
+#   'WinterSJ'
 #   'bugoff': For debugging and testing specific inputs. Hot w rapid cool off. Run with day = 1, hour = 0.
 #   'bugfreeze': Extreme cold values, rapidly gets colder, for testing. Run with day = 1, hour = 0.
 #   'bugcook': Extreme hot values, cools briefly then gets hotter for testing. Run with day = 1, hour = 0.
@@ -46,7 +47,7 @@ from scipy.stats import norm
 #   'bugAC': Figure out why cool mode keeps failing if the price changes
 #   'bughprice': Analogous to bugAC but for heating with price change
 # Make sure to put in single quotes
-date_range = 'bughprice' 
+date_range = 'Jan1thru7' 
 
 # ===> SET HEATING VS COOLING! <===
 # OR can instead designate in [PARAMETERS]
@@ -61,21 +62,22 @@ heatorcool = 'heat'
 #   'occupancy_sensor': optimization with only occupancy sensor data for current occupancy status
 #   'adaptive90': optimization with adaptive setpoints where 90% people are comfortable. No occupancy
 #   'fixed': optimization with fixed setpoints. No occupany.
-#   'occupancy_precognition': Optimize if occupancy status for entire prediction period (2 hrs into future) is known. A joke!?
-MODE = 'adaptive90'
+#   'occupancy_preschedule': Optimize if occupancy status for entire prediction period (2 hrs into future) is known, such as if people follow preset schedule.
+MODE = 'occupancy'
 
 # ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
 # These may not be recognized by UCEF Controller.java so HRO = False when running full simulations
-HRO = True
+HRO = False
 
 # Debug Setting - For developers debugging the b, D, AA, ineq matrices, leave false if you have no idea what this means
 HRO_DEBUG = False
 
 # Print HRO Header
 if HRO:
+    import datetime as datetime
     print()
-    print('=========== energyOptTset2hr.py V4.0 ===========')
+    print('=========== energyOptTset2hr.py V5.0 ===========')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: RUNNING')
 
 # Constants that should not be changed without a good reason --------------------------------
@@ -84,8 +86,8 @@ if HRO:
 temp_data_interval = 5
 
 # Time constants. Default is set for 1 week.
-n= 24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window)
-nt = 12 # Number of effective predicted timesteps
+n= 24 # number of timesteps within prediction windows (24 x 5-min timesteps in 2 hr window). Default - can be overwritten
+nt = 12 # Number of effective predicted timesteps - Default
 n_occ = 12 # number of timesteps for which occupancy data is considered known (12 = first hour for hourly occupancy data)
 timestep = 5*60
 # No longer used but kept for potential future use:
@@ -110,7 +112,7 @@ PRICING_OFFSET = 0.10
 #           python energyOptTset2hr.py day hour temp_indoor_initial heatorcool nt
 #           python energyOptTset2hr.py day hour temp_indoor_initial n MODE
 #           python energyOptTset2hr.py day hour temp_indoor_initial n MODE date_range
-#   Note: Linux may use 'python3' or 'python3.9' instead of 'python'
+#   Note: Linux use 'python3' or 'python3.9' instead of 'python'
 #         Windows use 'py'
 # where:
 #   day = [int] day number in simulation. 1 =< day =< [Number of days in simulation]
@@ -242,7 +244,7 @@ if "occupancy" in MODE:
     if MODE == 'occupancy' or MODE == 'occupancy_sensor':   
         occupancy_status = np.array(occupancy_df.Occupancy.iloc[(block-1)])
         
-    elif MODE == 'occupancy_precognition':
+    elif MODE == 'occupancy_preschedule':
         occupancy_status_all = occupancy_df.Occupancy.resample('5min').pad()
         occupancy_status = np.array(occupancy_status_all.iloc[(block-1)*12:(block-1)*12+n])
 
@@ -384,12 +386,12 @@ if 'occupancy' in MODE:
         spCool = probCool
         spHeat = probHeat
         while k<n:
-            b[2*k,0]=probCool[k]-S[k,0]
-            b[2*k+1,0]=-probHeat[k]+S[k,0]
+            b[2*k,0]=probCool[k,0]-S[k,0]
+            b[2*k+1,0]=-probHeat[k,0]+S[k,0]
             k=k+1
     
     # Infrequently used, so put last for speed
-    elif MODE == 'occupancy_precognition':
+    elif MODE == 'occupancy_preschedule':
         # Create occupancy table
         occnow = '\nTIME\t STATUS \n'
         while k<n:
@@ -397,8 +399,8 @@ if 'occupancy' in MODE:
             if occupancy_status[k] == 1:
                 spCool[k,0] = adaptiveCool[k,0]
                 spHeat[k,0] = adaptiveHeat[k,0]
-                b[2*k,0]=spCool[k]-S[k,0]
-                b[2*k+1,0]=-spHeat[k]+S[k,0]
+                b[2*k,0]=adaptiveCool[k,0]-S[k,0]
+                b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
                 occnow = occnow + str(k) + '\t OCCUPIED\n'
             else: # not occupied, so use probabilistic occupancy setpoints
                 spCool[k,0] = vacantCool
@@ -535,19 +537,20 @@ if x.value == None:
     while j<nt:
         print(q_solar[j,0])
         j = j+1
-    
+
+    print('heating min')
+    j = 0
+    while j<nt:
+        print(spHeat[j,0])
+        j=j+1
+
+    print('cooling max')
+    j = 0
+    while j<nt:
+        print(spCool[j,0])
+        j=j+1
+
     if HRO:
-        print('\nheating setpoints')
-        j = 0
-        while j<nt:
-            print(spHeat[j,0])
-            j=j+1
-        
-        print('\ncooling setpoints')
-        j = 0
-        while j<nt:
-            print(spCool[j,0])
-            j=j+1
         # Human-readable footer
         print('\n@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING WITHOUT OPTIMIZATION')
         print('================================================\n')
@@ -619,19 +622,19 @@ while j<nt:
     print(q_solar[j,0])
     j = j+1
 
-if HRO:
-    print('\nheating setpoint bounds')
-    j = 0
-    while j<nt:
-        print(spHeat[j,0])
-        j=j+1
+print('heating min')
+j = 0
+while j<nt:
+    print(spHeat[j,0])
+    j=j+1
 
-    print('cooling setpoint bounds')
-    j = 0
-    while j<nt:
-        print(spCool[j,0])
-        j=j+1
-    
+print('cooling max')
+j = 0
+while j<nt:
+    print(spCool[j,0])
+    j=j+1
+
+if HRO:
     # Footer for human-readable output
     print('\n@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING - OPTIMIZATION SUCCESS')
     print('================================================\n')
