@@ -1,7 +1,7 @@
 # occupancyAdaptSetpoints.py
 # Author(s):    Brian Woo-Shem, Kaleb Pattawi, PJ McCurdy
-# Version:      1.0
-# Last Updated: 2021-07-15
+# Version:      1.1  |  Simulation Version: 5.0
+# Last Updated: 2021-07-25
 # Changelog:
 # - Working non-optimizing adaptive and/or occupancy-based setpoints.
 # - Code is a forked subset of energyOptTset2hr V5.0
@@ -19,7 +19,6 @@ import time
 import pandas as pd
 import numpy as np
 import sys
-import datetime as datetime
 from scipy.stats import norm
 
 # IMPORTANT PARAMETERS TO CHANGE ------------------------------------------------
@@ -29,8 +28,10 @@ from scipy.stats import norm
 # Options: 
 #   'Jan1thru7'
 #   'Feb12thru19'
-#   'Sept27thruOct3'
+#   'Sep27-Oct3_SJ'
 #   'July1thru7'
+#   'SummerSJ'
+#   'WinterSJ'
 #   'bugoff': For debugging and testing specific inputs. Hot w rapid cool off. Run with day = 1, hour = 0.
 #   'bugfreeze': Extreme cold values, rapidly gets colder, for testing. Run with day = 1, hour = 0.
 #   'bugcook': Extreme hot values, cools briefly then gets hotter for testing. Run with day = 1, hour = 0.
@@ -39,7 +40,7 @@ from scipy.stats import norm
 #   'bugAC': Figure out why cool mode keeps failing if the price changes
 #   'bughprice': Analogous to bugAC but for heating with price change
 # Make sure to put in single quotes
-date_range = 'bughprice' 
+date_range = 'Jan1thru7' 
 
 # ===> SET HEATING VS COOLING! <===
 # OR can instead designate in [PARAMETERS]
@@ -54,18 +55,19 @@ heatorcool = 'heat'
 #   'occupancy_sensor': optimization with only occupancy sensor data for current occupancy status
 #   'adaptive90': optimization with adaptive setpoints where 90% people are comfortable. No occupancy
 #   'fixed': optimization with fixed setpoints. No occupany.
-#   'occupancy_precognition': Optimize if occupancy status for entire prediction period (2 hrs into future) is known. A joke!?
-MODE = 'adaptive90'
+#   'occupancy_preschedule': Optimize if occupancy status for entire prediction period (2 hrs into future) is known. A joke!?
+MODE = 'occupancy'
 
 # ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
 # These may not be recognized by UCEF Controller.java so HRO = False when running full simulations
-HRO = True
+HRO = False
 
 # Print HRO Header
 if HRO:
+    import datetime as datetime
     print()
-    print('=========== occupancyAdaptSetpoints.py V1.0 ===========')
+    print('=========== occupancyAdaptSetpoints.py V1.1 ===========')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: RUNNING')
 
 # Constants that should not be changed without a good reason --------------------------------
@@ -224,7 +226,7 @@ if "occupancy" in MODE:
     if MODE == 'occupancy' or MODE == 'occupancy_sensor':   
         occupancy_status = np.array(occupancy_df.Occupancy.iloc[(block-1)])
         
-    elif MODE == 'occupancy_precognition':
+    elif MODE == 'occupancy_preschedule':
         occupancy_status_all = occupancy_df.Occupancy.resample('5min').pad()
         occupancy_status = np.array(occupancy_status_all.iloc[(block-1)*12:(block-1)*12+n])
 
@@ -287,7 +289,7 @@ if 'occupancy' in MODE:
         spHeat = probHeat
     
     # Infrequently used, so put last for speed
-    elif MODE == 'occupancy_precognition':
+    elif MODE == 'occupancy_preschedule':
         # Create occupancy table
         occnow = '\nTIME\t STATUS \n'
         while k<n:
@@ -382,18 +384,19 @@ while j<nt:
     print(q_solar[j,0])
     j = j+1
 
+print('heating min')
+j = 0
+while j<nt:
+    print(spHeat[j,0])
+    j=j+1
+
+print('cooling max')
+j = 0
+while j<nt:
+    print(spCool[j,0])
+    j=j+1
+
 if HRO:
-    print('\nheating setpoints')
-    j = 0
-    while j<nt:
-        print(spHeat[j,0])
-        j=j+1
-    
-    print('\ncooling setpoints')
-    j = 0
-    while j<nt:
-        print(spCool[j,0])
-        j=j+1
     # Human-readable footer
     print('\n@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: TERMINATING - SETPOINTS SUCCESS')
     print('================================================\n')
