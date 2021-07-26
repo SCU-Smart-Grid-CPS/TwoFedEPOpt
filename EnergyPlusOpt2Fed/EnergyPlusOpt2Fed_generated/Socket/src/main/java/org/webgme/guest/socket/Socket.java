@@ -247,6 +247,7 @@ public class Socket extends SocketBase {
                 }
             }
             receivedSimTime = false;
+            waitTime = 0;
             //  End timestep workaround -------------------------------------------------------------------
 
             // Empty Data String for next time step
