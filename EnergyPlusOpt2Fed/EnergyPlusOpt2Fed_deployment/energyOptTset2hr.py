@@ -73,10 +73,10 @@ legacy = False
 # ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
 # These may not be recognized by UCEF Controller.java so HRO = False when running full simulations
-HRO = True
+HRO = False
 
 # Debug Setting - For developers debugging the b, D, AA, ineq matrices, leave false if you have no idea what this means
-HRO_DEBUG = True
+HRO_DEBUG = False
 
 # Print HRO Header
 if HRO:
