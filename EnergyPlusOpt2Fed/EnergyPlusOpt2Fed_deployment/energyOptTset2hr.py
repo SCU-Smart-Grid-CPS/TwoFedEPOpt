@@ -1,7 +1,7 @@
 # energyOptTset2hr.py
 # Author(s):    PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem
-# Version:      5.0
-# Last Updated: 2021-07-25
+# Version:      5.11 BETA
+# Last Updated: 2021-08-09
 # Changelog:
 # - Added switching for adaptive vs fixed vs occupancy control - Brian
 # - Added occupancy optimization - Brian
@@ -47,13 +47,13 @@ from scipy.stats import norm
 #   'bugAC': Figure out why cool mode keeps failing if the price changes
 #   'bughprice': Analogous to bugAC but for heating with price change
 # Make sure to put in single quotes
-date_range = 'Jan1thru7' 
+date_range = '2020-6-29_2020-7-05' 
 
 # ===> SET HEATING VS COOLING! <===
 # OR can instead designate in [PARAMETERS]
 #   'heat': only heater, use in winter
 #   'cool': only AC, use in summer
-heatorcool = 'heat'
+heatorcool = 'cool'
 
 # ===> MODE <===
 # OR can instead designate in [PARAMETERS]
@@ -65,19 +65,24 @@ heatorcool = 'heat'
 #   'occupancy_preschedule': Optimize if occupancy status for entire prediction period (2 hrs into future) is known, such as if people follow preset schedule.
 MODE = 'occupancy'
 
+# ===> LEGACY <===
+# Run older fileget setting using pd on .xlsx files for Outdoor Temp, Solar, & Wholesale Price.
+# Old method was excrutiatingly slow and won't work with the GetWeatherSolar EP and getWholesaleCAISO input data collection methods
+legacy = False
+
 # ===> Human Readable Output (HRO) SETTING <===
 # Extra outputs when testing manually in python or terminal
 # These may not be recognized by UCEF Controller.java so HRO = False when running full simulations
-HRO = False
+HRO = True
 
 # Debug Setting - For developers debugging the b, D, AA, ineq matrices, leave false if you have no idea what this means
-HRO_DEBUG = False
+HRO_DEBUG = True
 
 # Print HRO Header
 if HRO:
     import datetime as datetime
     print()
-    print('=========== energyOptTset2hr.py V5.0 ===========')
+    print('=========== energyOptTset2hr.py V5.10 ===========')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: RUNNING')
 
 # Constants that should not be changed without a good reason --------------------------------
@@ -144,37 +149,56 @@ if 4 < len(sys.argv):
                 if 8 < len(sys.argv): date_range = sys.argv[8]
 
 # constant coefficients for indoor temperature equation ------------------------------
-c1 = 1.72*10**-5
-c2 = 0.0031
-c3 = 3.58*10**-7
+c1 = 2.66*10**-5 #1.72*10**-5
+c2 = 7.20*10**-3 #0.0031
+c3 = 3.10*10**-7 #3.58*10**-7
 
 # Get data from excel/csv files ------------------------------------------------------
+startdat = (block-1)*12
 #   All xlsx files have single col of numbers at 5 minute intervals, starting on 2nd row. Only 2nd row and below is detected.
+if legacy: # These are excrutiatingly slow and aren't compatible with the new data collection methods
+    # Get outdoor temps [°C]
+    enddat = (block-1)*12+n
+    if temp_data_interval == 5: # 5 minutes can use directly
+        outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range,header=0, skiprows=startdat, nrows=n)#(block-1)*12+n+1)
+        outdoor_temp_df.columns = ['column1']
+        #temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+        temp_outdoor = matrix(outdoor_temp_df.iloc[0:n,0].to_numpy())
+    elif temp_data_interval == 60: #  for hourly data
+        outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range+'_2021_1hr',header=0)
+        start_date = datetime.datetime(2021,2,12)
+        dates = np.array([start_date + datetime.timedelta(hours=i) for i in range(8*24+1)])
+        outdoor_temp_df = outdoor_temp_df.set_index(dates)
+        # Changed to do linear interpolation of temperature to avoid the sudden jumps
+        outdoor_temp_df = outdoor_temp_df.resample('5min').Resampler.interpolate(method='linear')
+        temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
+        outdoor_temp_df.columns = ['column1']
+        temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+        #Leave outdoor_temp_df as type dataframe for later computations
 
-# Get outdoor temps [°C]
-if temp_data_interval == 5: # 5 minutes can use directly
-    outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range,header=0)
-    outdoor_temp_df.columns = ['column1']
-    temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
-elif temp_data_interval == 60: #  for hourly data
-    outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range+'_2021_1hr',header=0)
-    start_date = datetime.datetime(2021,2,12)
-    dates = np.array([start_date + datetime.timedelta(hours=i) for i in range(8*24+1)])
-    outdoor_temp_df = outdoor_temp_df.set_index(dates)
-    # Changed to do linear interpolation of temperature to avoid the sudden jumps
-    outdoor_temp_df = outdoor_temp_df.resample('5min').Resampler.interpolate(method='linear')
-    temp_outdoor_all=matrix(outdoor_temp_df.to_numpy())
-    outdoor_temp_df.columns = ['column1']
-    temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
-    #Leave outdoor_temp_df as type dataframe for later computations
+    # get solar radiation. Solar.xlsx must be in run directory
+    sol_df = pd.read_excel('Solar.xlsx', sheet_name=date_range, nrows=(block-1)*12+n+1)
+    q_solar = matrix(sol_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+    
+    # get wholesale prices. WholesalePrice.xlsx must be in run directory
+    price_df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range, nrows=(block-1)*12+n+1) 
+    cc=matrix(price_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())*PRICING_MULTIPLIER/1000+PRICING_OFFSET
+else:
+    wfile="GetWeatherSolar.csv" # Contains [date/time, outdoor temp, humidity, solar radiation]. Need 1 and 3.
 
-# get solar radiation. Solar.xlsx must be in run directory
-sol_df = pd.read_excel('Solar.xlsx', sheet_name=date_range)
-q_solar = matrix(sol_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+    outtempnp = np.genfromtxt(wfile, skip_header=startdat+1, max_rows=n, delimiter=',', usecols=1)
+    temp_outdoor = matrix(outtempnp)
 
-# get wholesale prices. WholesalePrice.xlsx must be in run directory
-price_df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range) 
-cc=matrix(price_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())*PRICING_MULTIPLIER/1000+PRICING_OFFSET
+    solarrad= np.genfromtxt(wfile, skip_header=startdat+1, max_rows=n, delimiter=',', usecols=3)
+    q_solar = matrix(solarrad)
+    
+    #To-Do: build a switcher for these automatically
+    #pfile = "WholesaleDayAhead_" + date_range + ".csv"
+    pfile = "WholesaleRealTime_" + date_range + ".csv"
+    wholesale= np.genfromtxt(pfile, skip_header=startdat, max_rows=n, delimiter=',')
+    cc = matrix(wholesale)*PRICING_MULTIPLIER/1000+PRICING_OFFSET
+
+
 
 # Compute Adaptive Setpoints ---------------------------------------------------------------
 # OK to remove if MODE != 'fixed' on your personal version only if the fixed mode is never used. Keep in master
@@ -184,19 +208,40 @@ if MODE != 'fixed':
     HEAT_TEMP_MIN_90 = 18.9
     COOL_TEMP_MAX_90 = 30.2
     COOL_TEMP_MIN_90 = 22.9
-    # use outdoor temps to get adaptive setpoints using lambda functions
-    outdoor_to_cool90 = lambda x: x*0.31 + 19.8
-    outdoor_to_heat90 = lambda x: x*0.31 + 15.8
-    adaptive_cooling_90 = outdoor_temp_df.apply(outdoor_to_cool90)
-    adaptive_heating_90 = outdoor_temp_df.apply(outdoor_to_heat90)
-    # When temps too low or too high set to min or max (See adaptive setpoints)
-    adaptive_cooling_90.loc[(adaptive_cooling_90['column1'] < COOL_TEMP_MIN_90)] = COOL_TEMP_MIN_90
-    adaptive_cooling_90.loc[(adaptive_cooling_90['column1'] > COOL_TEMP_MAX_90)] = COOL_TEMP_MAX_90
-    adaptive_heating_90.loc[(adaptive_heating_90['column1'] < HEAT_TEMP_MIN_90)] = HEAT_TEMP_MIN_90
-    adaptive_heating_90.loc[(adaptive_heating_90['column1'] > HEAT_TEMP_MAX_90)] = HEAT_TEMP_MAX_90
-    # change from pd dataframe to matrix
-    adaptiveCool = matrix(adaptive_cooling_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
-    adaptiveHeat = matrix(adaptive_heating_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+    if legacy:
+        # use outdoor temps to get adaptive setpoints using lambda functions
+        outdoor_to_cool90 = lambda x: x*0.31 + 19.8
+        outdoor_to_heat90 = lambda x: x*0.31 + 15.8
+        adaptive_cooling_90 = outdoor_temp_df.apply(outdoor_to_cool90)
+        adaptive_heating_90 = outdoor_temp_df.apply(outdoor_to_heat90)
+        # When temps too low or too high set to min or max (See adaptive setpoints)
+        adaptive_cooling_90.loc[(adaptive_cooling_90['column1'] < COOL_TEMP_MIN_90)] = COOL_TEMP_MIN_90
+        adaptive_cooling_90.loc[(adaptive_cooling_90['column1'] > COOL_TEMP_MAX_90)] = COOL_TEMP_MAX_90
+        adaptive_heating_90.loc[(adaptive_heating_90['column1'] < HEAT_TEMP_MIN_90)] = HEAT_TEMP_MIN_90
+        adaptive_heating_90.loc[(adaptive_heating_90['column1'] > HEAT_TEMP_MAX_90)] = HEAT_TEMP_MAX_90
+        # change from pd dataframe to matrix
+        adaptiveCool = matrix(adaptive_cooling_90.to_numpy())
+        adaptiveHeat = matrix(adaptive_heating_90.to_numpy())
+        #adaptiveCool = matrix(adaptive_cooling_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+        #adaptiveHeat = matrix(adaptive_heating_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
+    else: #New method avoiding pandas dataframes because they are slow and annoying
+        # Everything is already in np arrays
+        adc90 = np.zeros(n)
+        adh90 = np.zeros(n)
+        for i in range(0,len(outtempnp)):
+            # Adaptive cooling setpoint
+            if outtempnp[i] > COOL_TEMP_MAX_90: adc90[i] = COOL_TEMP_MAX_90
+            elif outtempnp[i] < COOL_TEMP_MIN_90: adc90[i] = COOL_TEMP_MIN_90
+            else: adc90[i]=outtempnp[i]*0.31 + 19.8
+            adaptiveCool = matrix(adc90)
+            # Adaptive heating setpoint
+            if outtempnp[i] > HEAT_TEMP_MAX_90: adh90[i] = HEAT_TEMP_MAX_90
+            elif outtempnp[i] < HEAT_TEMP_MIN_90: adh90[i] = HEAT_TEMP_MIN_90
+            else:  adh90[i]= outtempnp[i]*0.31 + 15.8
+            adaptiveHeat = matrix(adh90)
+        #if HRO_DEBUG:
+            #print(adaptiveCool)
+            #print(adaptiveHeat)
 
 # Get Occupancy Data & Compute Setpoints if Occupancy mode selected -------------------------
 if "occupancy" in MODE:
@@ -210,36 +255,70 @@ if "occupancy" in MODE:
     vacantHeat = 12
     
     #Initialize dataframe and read occupancy info 
-    occupancy_df = pd.read_csv('occupancy_1hr.csv')
+    #occupancy_df = pd.read_csv('occupancy_1hr.csv')
+    occupancy_df = pd.read_csv('occupancy_1hr.csv', nrows=(block+2))
     occupancy_df = occupancy_df.set_index('Dates/Times')
     occupancy_df.index = pd.to_datetime(occupancy_df.index)
+    #print('Occupancy data size: ')
+    #print(occupancy_df.shape)
     
     if MODE != 'occupancy_sensor':
-        # use outdoor temps to get bands where 100% of people are comfortable using lambda functions
-        convertOutTemptoCool100 = lambda x: x*0.31 + 19.3   # calculated that 100% band is +/-1.5C 
-        convertOutTemptoHeat100 = lambda x: x*0.31 + 16.3
-        adaptive_cooling_100 = outdoor_temp_df.apply(convertOutTemptoCool100)
-        adaptive_heating_100 = outdoor_temp_df.apply(convertOutTemptoHeat100)
-        # When temps too low or too high set to min or max (See adaptive 100)
-        adaptive_cooling_100.loc[(adaptive_cooling_100['column1'] < COOL_TEMP_MIN_100)] = COOL_TEMP_MIN_100
-        adaptive_cooling_100.loc[(adaptive_cooling_100['column1'] > COOL_TEMP_MAX_100)] = COOL_TEMP_MAX_100
-        adaptive_heating_100.loc[(adaptive_heating_100['column1'] < HEAT_TEMP_MIN_100)] = HEAT_TEMP_MIN_100
-        adaptive_heating_100.loc[(adaptive_heating_100['column1'] > HEAT_TEMP_MAX_100)] = HEAT_TEMP_MAX_100
-        # change from pd dataframe to matrix
-        adaptive_cooling_100 = matrix(adaptive_cooling_100.to_numpy())
-        adaptive_heating_100 = matrix(adaptive_heating_100.to_numpy())
+        if legacy: # Old dataframe method, slow
+            # use outdoor temps to get bands where 100% of people are comfortable using lambda functions
+            convertOutTemptoCool100 = lambda x: x*0.31 + 19.3   # calculated that 100% band is +/-1.5C 
+            convertOutTemptoHeat100 = lambda x: x*0.31 + 16.3
+            adaptive_cooling_100 = outdoor_temp_df.apply(convertOutTemptoCool100)
+            adaptive_heating_100 = outdoor_temp_df.apply(convertOutTemptoHeat100)
+            # When temps too low or too high set to min or max (See adaptive 100)
+            adaptive_cooling_100.loc[(adaptive_cooling_100['column1'] < COOL_TEMP_MIN_100)] = COOL_TEMP_MIN_100
+            adaptive_cooling_100.loc[(adaptive_cooling_100['column1'] > COOL_TEMP_MAX_100)] = COOL_TEMP_MAX_100
+            adaptive_heating_100.loc[(adaptive_heating_100['column1'] < HEAT_TEMP_MIN_100)] = HEAT_TEMP_MIN_100
+            adaptive_heating_100.loc[(adaptive_heating_100['column1'] > HEAT_TEMP_MAX_100)] = HEAT_TEMP_MAX_100
+            # change from pd dataframe to matrix
+            adaptive_cooling_100 = matrix(adaptive_cooling_100.to_numpy())
+            adaptive_heating_100 = matrix(adaptive_heating_100.to_numpy())
+        else: # New np method, for getWholesaleCAISO and GetWeatherSolar, fast
+            adc100 = np.zeros(n)
+            adh100 = np.zeros(n)
+            for i in range(0,len(outtempnp)):
+                if outtempnp[i] > COOL_TEMP_MAX_100: adc100[i] = COOL_TEMP_MAX_100
+                elif outtempnp[i] < COOL_TEMP_MIN_100: adc100[i] = COOL_TEMP_MIN_100
+                else: adc100[i]=outtempnp[i]*0.31 + 19.8
+                adaptive_cooling_100 = matrix(adc100)
+                
+                if outtempnp[i] > HEAT_TEMP_MAX_100: adh100[i] = HEAT_TEMP_MAX_100
+                elif outtempnp[i] < HEAT_TEMP_MIN_100: adh100[i] = HEAT_TEMP_MIN_100
+                else:  adh100[i]= outtempnp[i]*0.31 + 15.8
+                adaptive_heating_100 = matrix(adh100)
+            #if HRO_DEBUG:
+                #print(adaptive_cooling_100)
+                #print(adaptive_heating_100)
         
         # hourly occupancy probability data to 5 minute intervals
         occ_prob_all = occupancy_df.Probability.resample('5min').interpolate(method='linear')
         
-        # Calculate comfort band
+        # Calculate Occupancy Probability comfort band
         sigma = 3.937 # This was calculated based on adaptive comfort being normally distributed
         #Apply comfort bound function - requires using dataframe to do the lambda
         op_comfort_range = occ_prob_all.iloc[(block-1)*12:(block-1)*12+n].apply(lambda x: (1-x)/2)+1/2
         op_comfort_range = np.array(op_comfort_range.apply(lambda y: norm.ppf(y)*sigma))
         
-        probHeat = adaptive_heating_100[(block-1)*12:(block-1)*12+n,0]-op_comfort_range
-        probCool = adaptive_cooling_100[(block-1)*12:(block-1)*12+n,0]+op_comfort_range
+        # Added to set back the one that is active, but not oversetback the inactive one because the optimizer will sometimes ridiculously overcool or overheat otherwise.
+        if heatorcool == 'heat': 
+            probHeat = adaptive_heating_100-op_comfort_range
+            probCool = adaptiveCool
+        else: #Cool
+            probCool = adaptive_cooling_100+op_comfort_range
+            probHeat = adaptiveHeat
+            
+        # if legacy:
+            # probHeat = adaptive_heating_100[(block-1)*12:(block-1)*12+n,0]-op_comfort_range
+            # probCool = adaptive_cooling_100[(block-1)*12:(block-1)*12+n,0]+op_comfort_range
+        # else:
+            # probHeat = adaptive_heating_100-op_comfort_range
+            # probCool = adaptive_cooling_100+op_comfort_range
+        #print(probHeat)
+        #print(probCool)
         
     if MODE == 'occupancy' or MODE == 'occupancy_sensor':   
         occupancy_status = np.array(occupancy_df.Occupancy.iloc[(block-1)])
@@ -314,7 +393,8 @@ coollimiteq = (cool_negative * x <= energyLimit)
 S = matrix(0.0, (n,1))
 S[0,0] = timestep*(c1*(temp_outdoor[0]-temp_indoor_initial)+c3*q_solar[0])+temp_indoor_initial
 
-#Loop to solve all S^(n) for n > 1
+#Loop to solve all S^(n) for n > 1. Each S value represents the predicted indoor temp at that time
+#  based on predictions for previous timestep
 i=1
 while i<n:
     S[i,0] = timestep*(c1*(temp_outdoor[i]-S[i-1,0])+c3*q_solar[i])+S[i-1,0]
@@ -375,10 +455,16 @@ if 'occupancy' in MODE:
         # At this point, k = n_occ = 12 if Occupied,   k = 0 if UNoccupied at t = first_timestep
         # Assume it is UNoccupied at t > first_timestep and use the vacant setpoints. vacantCool and vacantHeat are scalar constants
         while k < n:
-            spCool[k,0] = vacantCool
-            spHeat[k,0] = vacantHeat
-            b[2*k,0]=vacantCool-S[k,0]
-            b[2*k+1,0]=-vacantHeat+S[k,0]
+            if heatorcool == 'cool':
+                spCool[k,0] = vacantCool
+                spHeat[k,0] = adaptiveHeat[k,0]
+                b[2*k,0]=vacantCool-S[k,0]
+                b[2*k+1,0]=-adaptiveHeat[k,0]+S[k,0]
+            else: 
+                spHeat[k,0] = vacantHeat
+                spCool[k,0] = adaptiveCool[k,0]
+                b[2*k+1,0]=-vacantHeat+S[k,0]
+                b[2*k,0]=adaptiveCool[k,0]-S[k,0]
             k = k + 1
     
     elif MODE == 'occupancy_prob':
@@ -577,18 +663,20 @@ cost = cost + lp2.objective.value()
 # make the setpoints equal to the estimate, EP may not have that natural change, and instead need to run 
 # HVAC unnecessarily. Since the optimizer doesn't expect HVAC to run when the energy usage = 0, make the 
 # setpoints = comfort zone bounds to prevent this.
-if HRO:
+if HRO_DEBUG:
     print('Indoor Temperature Prediction Before Zero Energy Correction\n', temp_indoor, '\n')
-p=0
-while p<nt:
-    # If energy is near zero, change setpoint to bound spHeat or spCool
-    if heatorcool == 'cool' and energy[p] > -0.0001:
-        temp_indoor[p] = spCool[p,0]
-    elif heatorcool == 'heat' and energy[p] < 0.0001:
-        temp_indoor[p] = spHeat[p,0]
-    p = p+1
-if HRO:
-    print('Indoor Temperature Setting After Zero Energy Correction\n', temp_indoor, '\n')
+dothis = False
+if dothis:
+    p=0
+    while p<nt:
+        # If energy is near zero, change setpoint to bound spHeat or spCool
+        if heatorcool == 'cool' and energy[p] > -0.0001:
+            temp_indoor[p] = spCool[p,0]
+        elif heatorcool == 'heat' and energy[p] < 0.0001:
+            temp_indoor[p] = spHeat[p,0]
+        p = p+1
+    if HRO_DEBUG:
+        print('Indoor Temperature Setting After Zero Energy Correction\n', temp_indoor, '\n')
 
 # Print output to be read by Controller.java ---------------------------------------------
 # Typically send 12 of each value, representing 1 hour.
