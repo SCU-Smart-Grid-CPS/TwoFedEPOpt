@@ -1,12 +1,11 @@
 # TwoFedEPOpt
 Optimization in Python connected to controller UCEF federate.   
-Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulations in the EP_SF_Optimization_House_Model or at https://github.com/SCU-Smart-Grid-CPS/ep-multiple-sims
+Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulations in the EP_SF_Optimization_House_Model folder or at https://github.com/SCU-Smart-Grid-CPS/Energy-Plus-Co-Sim-Models
 
 ### Run Instructions - UCEF
-* Change filepaths in Controller.java and Socket.java
 * Check weather and pricing spreadsheet dates in Controller.java and energyOptTset.py
-* Change IP in EnergyPlusOpt2Fed_generated/config.txt
-* Change booleans in Controller.java & energyOptTSet.py to set Fixed vs Adaptive and Optimized vs Not Optimized
+* Change IP in config.txt
+* Change control type, optimization status, run period in config.txt
 * Compile Controller.java and Socket.java
 * See https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki for UCEF operation.
 * Change date_range, heatorcool, MODE, HRO settings on energyOptTset.py
@@ -18,8 +17,19 @@ Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulati
 * Zip the contents as "Joe_ep_fmu.fmu"
 * Replace the Joe_ep_fmu.fmu in the folder with the EP .idf with the new fmu created in the previous step
 * Wait until the Socket says "Waiting for Energy Plus simulations to join" before starting the simulation
+* For more FMU info, see https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki/Link-EnergyPlus-and-UCEF-using-Joe_ep_fmu
 
 ### Changelog
+2021-08-11 (Brian)
+* Version 5.11 BETA adds GetWholesaleCAISO and getWeatherSolar support to version 5.0
+* Improved runtime with GetWholesaleCAISO and getWeatherSolar files. 
+* See documentation: https://github.com/SCU-Smart-Grid-CPS/TwoFedEPOpt/blob/brianupdates/EnergyPlusOpt2Fed/EnergyPlusOptOcc2Fed%20v5.1-%20What's%20New%20%26%20User%20Guide.pdf
+
+2021-07-27 (Brian)
+* Version 5.01 Stable release!
+* Adds full occupancy support and many runtime improvements including no-recompile configuration, faster operation, and better debugging outputs
+* See documentation: https://github.com/SCU-Smart-Grid-CPS/TwoFedEPOpt/blob/brianupdates/EnergyPlusOpt2Fed/EnergyPlusOptOcc2Fed%20v5.0-%20What's%20New%20%26%20User%20Guide.pdf
+
 2021-07-14 (Brian)
 * Complete overhaul of energyOptTset2hr.py
 * Occupancy optimization with 3 modes, along with optimization of fixed and adaptive setpoints, with easy switching at the top of the file between the options using MODE
