@@ -9,7 +9,7 @@
   "port": 8083,
   "controlEndpoint": "/fedmgr",
   "federatesEndpoint": "/federates",
-  "federationEndTime": 0,
+  "federationEndTime": 9000,
   "realTimeMode": false,
   "fedFile": "fom/EnergyPlusOpt2Fed.fed",
   "experimentConfig": "conf/default/experimentConfig.json"
