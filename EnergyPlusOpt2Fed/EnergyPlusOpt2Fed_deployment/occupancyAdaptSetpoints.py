@@ -1,7 +1,7 @@
 # occupancyAdaptSetpoints.py
 # Author(s):    Brian Woo-Shem, Kaleb Pattawi, PJ McCurdy
-# Version:      1.3  |  Simulation Version: 5.11 BETA
-# Last Updated: 2021-08-09
+# Version:      1.5  |  Simulation Version: 5.30 BETA
+# Last Updated: 2021-08-27
 # Changelog:
 # - Added np csv input for new price and weather file collection method
 # - Working non-optimizing adaptive and/or occupancy-based setpoints.
@@ -10,8 +10,6 @@
 #   Typically run from Controller.java in UCEF energyPlusOpt2Fed or EP_MultipleSims. Will be run again for every hour of simulation.
 #   For debugging, can run as python script. In folder where this is stored:
 #   ~$ python occupancyAdaptSetpoints.py [Parameters - See "ACCEPT INPUT PARAMETERS" section] 
-#   Requires OutdoorTemp.xlsx, occupancy_1hr.csv, Solar.xlsx, WholesalePrice.xlsx in run directory
-#   Check constants & parameters denoted by ===> IMPORTANT <===
 
 # Import Packages ---------------------------------------------------------------
 from cvxopt import matrix, solvers
@@ -21,12 +19,14 @@ import pandas as pd
 import numpy as np
 import sys
 from scipy.stats import norm
+from configparser import ConfigParser
+
 
 # IMPORTANT PARAMETERS TO CHANGE ------------------------------------------------
 
 # ===> WHEN TO RUN <=== CHECK IT MATCHES EP!!!
 # OR can instead designate in [PARAMETERS]
-# Options: 
+# Legacy Options: 
 #   'Jan1thru7'
 #   'Feb12thru19'
 #   'Sep27-Oct3_SJ'
@@ -41,13 +41,21 @@ from scipy.stats import norm
 #   'bugAC': Figure out why cool mode keeps failing if the price changes
 #   'bughprice': Analogous to bugAC but for heating with price change
 # Make sure to put in single quotes
-date_range = 'Jan1thru7' 
+date_range = '2020-08-01_2020-08-31' #'2020-6-29_2020-7-05'
+
+# Location
+loc = "Default"
+
+# Wholesale Type
+# 'r' = real-time
+# 'd' = day-ahead
+wholesaleType = 'r'
 
 # ===> SET HEATING VS COOLING! <===
 # OR can instead designate in [PARAMETERS]
 #   'heat': only heater, use in winter
 #   'cool': only AC, use in summer
-heatorcool = 'heat'
+heatorcool = 'cool'
 
 # ===> MODE <===
 # OR can instead designate in [PARAMETERS]
@@ -73,7 +81,7 @@ HRO = False
 if HRO:
     import datetime as datetime
     print()
-    print('=========== occupancyAdaptSetpoints.py V1.1 ===========')
+    print('=========== occupancyAdaptSetpoints.py V1.5 ===========')
     print('@ ' + datetime.datetime.today().strftime("%Y-%m-%d_%H:%M:%S") + '   Status: RUNNING')
 
 # Constants that should not be changed without a good reason --------------------------------
@@ -87,10 +95,6 @@ nt = 12 # Number of effective predicted timesteps
 n_occ = 12 # number of timesteps for which occupancy data is considered known (12 = first hour for hourly occupancy data)
 timestep = 5*60
 
-# Pricing constants.
-PRICING_MULTIPLIER = 4.0
-PRICING_OFFSET = 0.10
-
 # ACCEPT INPUT PARAMETERS ----------------------------------------------------------------------
 # From UCEF or command line
 # Run as:
@@ -98,7 +102,7 @@ PRICING_OFFSET = 0.10
 #           python occupancyAdaptSetpoints.py day hour temp_indoor_initial n nt
 #           python occupancyAdaptSetpoints.py day hour temp_indoor_initial n nt heatorcool
 #           python occupancyAdaptSetpoints.py day hour temp_indoor_initial n nt heatorcool MODE
-#           python occupancyAdaptSetpoints.py day hour temp_indoor_initial n nt heatorcool MODE date_range
+#           python occupancyAdaptSetpoints.py day hour temp_indoor_initial n nt heatorcool MODE date_range loc wholesaleType
 #           python occupancyAdaptSetpoints.py day hour temp_indoor_initial heatorcool
 #           python occupancyAdaptSetpoints.py day hour temp_indoor_initial heatorcool MODE
 #           python occupancyAdaptSetpoints.py day hour temp_indoor_initial heatorcool MODE date_range
@@ -134,7 +138,31 @@ if 4 < len(sys.argv):
             except ValueError: date_range = sys.argv[6]
             if 7 < len(sys.argv): # Now guaranteed to be strings, per syntax rules
                 MODE = sys.argv[7]
-                if 8 < len(sys.argv): date_range = sys.argv[8]
+                if 8 < len(sys.argv): 
+                    date_range = sys.argv[8]
+                    if 9 < len(sys.argv): 
+                        loc = sys.argv[9]
+                        if 10 < len(sys.argv): wholesaleType = sys.argv[10]
+
+# constant coefficients for indoor temperature equation & pricing ------------------------------
+# Read config file to get constants for this simulation. Need to pass location "loc" from Controller.java
+cfp = ConfigParser()
+cfp.read('optCoeff.ini')
+sectionName = loc + "_" + heatorcool[0] #Generate formulaic temp coeff section name
+try: #For dealing with various errors if the sectionName is not found in .ini file
+    try: 
+        c1 = float(cfp.get(sectionName,'c1'))
+        c2 = float(cfp.get(sectionName,'c2'))
+        c3 = float(cfp.get(sectionName,'c3'))
+        PRICING_MULTIPLIER = float(cfp.get('Pricing_Constants', 'PRICING_MULTIPLIER'))
+        PRICING_OFFSET = float(cfp.get('Pricing_Constants', 'PRICING_OFFSET'))
+    except (configparser.NoSectionError): c1,c2,c3 = [1,2,3]
+except (NameError, ValueError): # Old defaults
+    c1 = 1.72*10**-5 #1.72*10**-5 #2.66*10**-5
+    c2 = 7.20*10**-3 #0.0031
+    c3 = 1.55*10**-7 #3.10*10**-7 #3.58*10**-7
+    PRICING_MULTIPLIER = 15.0 #4.0 Changed to try to make optimization more effective (from Dr. Lee suggestion)
+    PRICING_OFFSET = 0.005 #0.10
 
 # Get data from excel/csv files ------------------------------------------------------
 startdat = (block-1)*12
@@ -143,9 +171,8 @@ if legacy: # These are excrutiatingly slow and aren't compatible with the new da
     # Get outdoor temps [°C]
     enddat = (block-1)*12+n
     if temp_data_interval == 5: # 5 minutes can use directly
-        outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range,header=0, skiprows=startdat, nrows=n)#(block-1)*12+n+1)
+        outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range,header=0, skiprows=startdat, nrows=n)
         outdoor_temp_df.columns = ['column1']
-        #temp_outdoor = matrix(outdoor_temp_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
         temp_outdoor = matrix(outdoor_temp_df.iloc[0:n,0].to_numpy())
     elif temp_data_interval == 60: #  for hourly data
         outdoor_temp_df = pd.read_excel('OutdoorTemp.xlsx', sheet_name=date_range+'_2021_1hr',header=0)
@@ -167,7 +194,11 @@ if legacy: # These are excrutiatingly slow and aren't compatible with the new da
     price_df = pd.read_excel('WholesalePrice.xlsx', sheet_name=date_range, nrows=(block-1)*12+n+1) 
     cc=matrix(price_df.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())*PRICING_MULTIPLIER/1000+PRICING_OFFSET
 else:
-    wfile="GetWeatherSolar.csv" # Contains [date/time, outdoor temp, humidity, solar radiation]. Need 1 and 3.
+    # Use GetWeatherSolar output
+    # Filename format is  WeatherSolar_SF_2020-01-01_2020-01-07.csv
+    wfile = "WeatherSolar_" + loc + "_" + date_range + ".csv"
+    if loc == "default": wfile="GetWeatherSolar.csv" # Catch for older versions
+    # Contains [date/time, outdoor temp, humidity, solar radiation]. Need 1 and 3.
 
     outtempnp = np.genfromtxt(wfile, skip_header=startdat+1, max_rows=n, delimiter=',', usecols=1)
     temp_outdoor = matrix(outtempnp)
@@ -175,9 +206,9 @@ else:
     solarrad= np.genfromtxt(wfile, skip_header=startdat+1, max_rows=n, delimiter=',', usecols=3)
     q_solar = matrix(solarrad)
     
-    #To-Do: build a switcher for these automatically
-    #pfile = "WholesaleDayAhead_" + date_range + ".csv"
-    pfile = "WholesaleRealTime_" + date_range + ".csv"
+    #Get wholesale data matching date range and type
+    if 'd' in wholesaleType.lower(): pfile = "WholesaleDayAhead_" + date_range + ".csv"
+    else: pfile = "WholesaleRealTime_" + date_range + ".csv"
     wholesale= np.genfromtxt(pfile, skip_header=startdat, max_rows=n, delimiter=',')
     cc = matrix(wholesale)*PRICING_MULTIPLIER/1000+PRICING_OFFSET
 
@@ -203,22 +234,21 @@ if MODE != 'fixed':
         # change from pd dataframe to matrix
         adaptiveCool = matrix(adaptive_cooling_90.to_numpy())
         adaptiveHeat = matrix(adaptive_heating_90.to_numpy())
-        #adaptiveCool = matrix(adaptive_cooling_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
-        #adaptiveHeat = matrix(adaptive_heating_90.iloc[(block-1)*12:(block-1)*12+n,0].to_numpy())
     else: #New method avoiding pandas dataframes because they are slow and annoying
         # Everything is already in np arrays
         adc90 = np.zeros(n)
         adh90 = np.zeros(n)
         for i in range(0,len(outtempnp)):
             # Adaptive cooling setpoint
-            if outtempnp[i] > COOL_TEMP_MAX_90: adc90[i] = COOL_TEMP_MAX_90
-            elif outtempnp[i] < COOL_TEMP_MIN_90: adc90[i] = COOL_TEMP_MIN_90
-            else: adc90[i]=outtempnp[i]*0.31 + 19.8
+            adc90[i]=outtempnp[i]*0.31 + 19.8
+            if adc90[i] > COOL_TEMP_MAX_90: adc90[i] = COOL_TEMP_MAX_90
+            elif adc90[i] < COOL_TEMP_MIN_90: adc90[i] = COOL_TEMP_MIN_90
             adaptiveCool = matrix(adc90)
+            
             # Adaptive heating setpoint
-            if outtempnp[i] > HEAT_TEMP_MAX_90: adh90[i] = HEAT_TEMP_MAX_90
-            elif outtempnp[i] < HEAT_TEMP_MIN_90: adh90[i] = HEAT_TEMP_MIN_90
-            else:  adh90[i]= outtempnp[i]*0.31 + 15.8
+            adh90[i]= outtempnp[i]*0.31 + 15.8
+            if adh90[i] > HEAT_TEMP_MAX_90: adh90[i] = HEAT_TEMP_MAX_90
+            elif adh90[i] < HEAT_TEMP_MIN_90: adh90[i] = HEAT_TEMP_MIN_90
             adaptiveHeat = matrix(adh90)
 
 # Get Occupancy Data & Compute Setpoints if Occupancy mode selected -------------------------
@@ -232,10 +262,27 @@ if "occupancy" in MODE:
     vacantCool = 32
     vacantHeat = 12
     
-    #Initialize dataframe and read occupancy info 
-    occupancy_df = pd.read_csv('occupancy_1hr.csv')
-    occupancy_df = occupancy_df.set_index('Dates/Times')
-    occupancy_df.index = pd.to_datetime(occupancy_df.index)
+    # Use new np compatible 5min csv datasets. IF they don't exist, create them first - should only need to do that on first run.
+    try:
+        occ_prob = np.genfromtxt('occupancy_probability_5min.csv', skip_header=startdat+1, max_rows=n, delimiter=',', usecols=1)
+        occupancy_status = np.genfromtxt('occupancy_status_5min.csv', skip_header=startdat+1, max_rows=n, delimiter=',', usecols=1)
+    except OSError: #If np compatible 5min csv occupancy data does not exist yet, create it using old pd method
+        #Initialize dataframe and read occupancy info 
+        occupancy_df = pd.read_csv('occupancy_1hr.csv')
+        occupancy_df = occupancy_df.set_index('Dates/Times')
+        occupancy_df.index = pd.to_datetime(occupancy_df.index)
+        # Resample using linear interpolation and export result
+        occ_prob_df = occupancy_df.Probability.resample('5min').interpolate(method='linear')
+        occ_prob_file = 'occupancy_probability_5min.csv'
+        occ_prob_df.to_csv(occ_prob_file, header=True)
+        if HRO: print("\nOccupancy Probability Exported to: ", occ_prob_file)
+        # Resample with copy beginning of hour value and export result
+        occ_stat_df = occupancy_df.Occupancy.resample('5min').pad()
+        occ_stat_file = 'occupancy_status_5min.csv'
+        occ_stat_df.to_csv(occ_stat_file, header=True)
+        if HRO: print("\nOccupancy Status Exported to: ", occ_stat_file)
+        occ_prob = np.genfromtxt('occupancy_probability_5min.csv', skip_header=startdat+1, max_rows=n, delimiter=',', usecols=1)
+        occupancy_status = np.genfromtxt('occupancy_status_5min.csv', skip_header=startdat+1, max_rows=n, delimiter=',', usecols=1)
     
     if MODE != 'occupancy_sensor':
         if legacy:  # Old dataframe method, slow
@@ -256,35 +303,26 @@ if "occupancy" in MODE:
             adc100 = np.zeros(n)
             adh100 = np.zeros(n)
             for i in range(0,len(outtempnp)):
-                if outtempnp[i] > COOL_TEMP_MAX_100: adc100[i] = COOL_TEMP_MAX_100
-                elif outtempnp[i] < COOL_TEMP_MIN_100: adc100[i] = COOL_TEMP_MIN_100
-                else: adc100[i]=outtempnp[i]*0.31 + 19.8
+                adc100[i]=outtempnp[i]*0.31 + 19.8
+                if adc100[i] > COOL_TEMP_MAX_100: adc100[i] = COOL_TEMP_MAX_100
+                elif adc100[i] < COOL_TEMP_MIN_100: adc100[i] = COOL_TEMP_MIN_100
                 adaptive_cooling_100 = matrix(adc100)
                 
-                if outtempnp[i] > HEAT_TEMP_MAX_100: adh100[i] = HEAT_TEMP_MAX_100
-                elif outtempnp[i] < HEAT_TEMP_MIN_100: adh100[i] = HEAT_TEMP_MIN_100
-                else:  adh100[i]= outtempnp[i]*0.31 + 15.8
+                adh100[i]= outtempnp[i]*0.31 + 15.8
+                if adh100[i] > HEAT_TEMP_MAX_100: adh100[i] = HEAT_TEMP_MAX_100
+                elif adh100[i] < HEAT_TEMP_MIN_100: adh100[i] = HEAT_TEMP_MIN_100
                 adaptive_heating_100 = matrix(adh100)
-        
-        # hourly occupancy probability data to 5 minute intervals
-        occ_prob_all = occupancy_df.Probability.resample('5min').interpolate(method='linear')
         
         # Calculate comfort band
         sigma = 3.937 # This was calculated based on adaptive comfort being normally distributed
-        #Apply comfort bound function - requires using dataframe to do the lambda
-        op_comfort_range = occ_prob_all.iloc[(block-1)*12:(block-1)*12+n].apply(lambda x: (1-x)/2)+1/2
-        op_comfort_range = np.array(op_comfort_range.apply(lambda y: norm.ppf(y)*sigma))
+        
+        fx = np.vectorize(lambda x: (1-x)/2 +1/2)
+        fy = np.vectorize(lambda y: norm.ppf(y)*sigma)
+        op_comfort_range = fy(fx(occ_prob))
         
         #see opt code for what older version looked like.
         probHeat = adaptive_heating_100-op_comfort_range
         probCool = adaptive_cooling_100+op_comfort_range
-        
-    if MODE == 'occupancy' or MODE == 'occupancy_sensor':   
-        occupancy_status = np.array(occupancy_df.Occupancy.iloc[(block-1)])
-        
-    elif MODE == 'occupancy_preschedule':
-        occupancy_status_all = occupancy_df.Occupancy.resample('5min').pad()
-        occupancy_status = np.array(occupancy_status_all.iloc[(block-1)*12:(block-1)*12+n])
 
 #------------------------ Data Ready! -------------------------
 
@@ -306,7 +344,7 @@ if 'occupancy' in MODE:
         # String for displaying occupancy status
         occnow = ''
         # If occupancy is initially true (occupied)
-        if occupancy_status == 1:
+        if occupancy_status[0] == 1:
             occnow = 'OCCUPIED'
             # Do for the number of timesteps where occupancy is known truth
             while k < n_occ:
@@ -324,7 +362,7 @@ if 'occupancy' in MODE:
     elif MODE == 'occupancy_sensor':
         occnow = ''
         # If occupancy is initially true (occupied)
-        if occupancy_status == 1:
+        if occupancy_status[0] == 1:
             occnow = 'OCCUPIED'
             # Do for the number of timesteps where occupancy is known truth
             while k < n_occ:
@@ -410,7 +448,7 @@ while j<nt:
 # Set indoor temperature to the setpoints depending on heat vs cool mode
 temp_indoor = matrix(0.0, (nt,1))
 
-if heatorcool == 'cool':
+if 'c' in heatorcool:
     temp_indoor = spCool
 else: #heat
     temp_indoor = spHeat

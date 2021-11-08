@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="maven-antrun-" default="main"  >
 <target name="main">
-  <copy todir="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_5-0/EnergyPlusOpt2Fed_generated/Socket/target/conf" overwrite="true">
-    <fileset dir="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_5-0/EnergyPlusOpt2Fed_generated/Socket/conf"/>
+  <copy todir="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_v5.0_Stable/EnergyPlusOpt2Fed_generated/Socket/target/conf" overwrite="true">
+    <fileset dir="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_v5.0_Stable/EnergyPlusOpt2Fed_generated/Socket/conf"/>
   </copy>
-  <copy todir="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_5-0/EnergyPlusOpt2Fed_generated/Socket/target" overwrite="true">
-    <fileset file="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_5-0/EnergyPlusOpt2Fed_generated/Socket/RTI.rid"/>
+  <copy todir="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_v5.0_Stable/EnergyPlusOpt2Fed_generated/Socket/target" overwrite="true">
+    <fileset file="/home/vagrant/Desktop/EnergyPlusOccOpt2Fed_v5.0_Stable/EnergyPlusOpt2Fed_generated/Socket/RTI.rid"/>
   </copy>
 </target>
 </project>
