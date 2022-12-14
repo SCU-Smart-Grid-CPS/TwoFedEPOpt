@@ -16,7 +16,7 @@ Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulati
 * Zip the contents as "Joe_ep_fmu.fmu"
 * Replace the Joe_ep_fmu.fmu in the folder with the EP .idf with the new fmu created in the previous step
 * Wait until the Socket says "Waiting for Energy Plus simulations to join" before starting the simulation
-* (FMU Instructions)[https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki/Link-EnergyPlus-and-UCEF-using-Joe_ep_fmu]
+* [FMU Instructions](https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki/Link-EnergyPlus-and-UCEF-using-Joe_ep_fmu)
 
 ### Changelog
 
