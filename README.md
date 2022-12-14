@@ -5,10 +5,9 @@ Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulati
 ### Run Instructions - UCEF
 * Check weather and pricing spreadsheet dates in Controller.java and energyOptTset.py
 * Change IP in config.txt
-* Change control type, optimization status, run period in config.txt
+* Change control type, optimization status, run period, date_range, heatorcool, MODE, HRO settings in config.txt
 * Compile Controller.java and Socket.java
-* See https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki for UCEF operation.
-* Change date_range, heatorcool, MODE, HRO settings on energyOptTset.py
+* [UCEF Operation Instructions](https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki)
 
 ### Run Instructions - EP
 * Open .idf in EP
@@ -17,9 +16,21 @@ Socket UCEF federate connects to EnergyPlus simulation. Compatible with simulati
 * Zip the contents as "Joe_ep_fmu.fmu"
 * Replace the Joe_ep_fmu.fmu in the folder with the EP .idf with the new fmu created in the previous step
 * Wait until the Socket says "Waiting for Energy Plus simulations to join" before starting the simulation
-* For more FMU info, see https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki/Link-EnergyPlus-and-UCEF-using-Joe_ep_fmu
+* (FMU Instructions)[https://github.com/SCU-Smart-Grid-CPS/smart-grid-energy-simulation-research/wiki/Link-EnergyPlus-and-UCEF-using-Joe_ep_fmu]
 
 ### Changelog
+
+2022-12-14 (Brian)
+* Uploading remaining files for V5.60 Stable.
+* This is the final planned update to this project. Our research direction is moving away from optimization and toward more implementable control and modeling equity between different income levels. Future UCEF federation work will be in the [Supercontroller project.](https://github.com/SCU-Smart-Grid-CPS/UCEF-Supercontroller)
+
+2022-10-01 (Brian)
+* Version 5.60 Stable
+* Integration with Appliance Scheduler (dishwasher)
+* Optimizer improvements
+* All settings are determined in Config.txt. No need to modify the Python or Java code files
+* Full reliability validation; used in paper "Economic Benefits of a Novel HVAC Control Strategy in Grid-Interactive Residential Buildings"
+
 2021-08-11 (Brian)
 * Version 5.11 BETA adds GetWholesaleCAISO and getWeatherSolar support to version 5.0
 * Improved runtime with GetWholesaleCAISO and getWeatherSolar files. 
