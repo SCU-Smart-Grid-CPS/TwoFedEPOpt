@@ -1,0 +1,17 @@
+< config.txt | EP + UCEF Occupancy Optimization Settings | Version 5.3 | Updated 2021-08-26 | Author: Brian Woo-Shem >
+ip_address: <Options: 192.168.56.101 for VirtualBox, 10.16.130.### for Cluster>
+192.168.56.101
+port_number: <Socket 0 use 6789, +1 for each additional simulation>
+6789
+MODE: < occupancy, occupancy_prob, occupancy_sensor, adaptive90, fixed, occupancy_precognition >
+occupancy
+heatorcool: < heat, cool >
+cool
+date_range: < Match EP. Options: Jan1thru7, Feb12thru19, Sep27-Oct3_SJ >
+2020-08-01_2020-08-31
+optimize: < true, false >
+true
+location: < Abbr location for temp predict coeff, use Default if unsure >
+SF
+wholesale_type: < r = real-time, d = day-ahead >
+r

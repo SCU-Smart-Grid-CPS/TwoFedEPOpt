@@ -2,8 +2,8 @@
 File:           controller.java
 Project:        EnergyPlusOptOcc2Fed
 Author(s):      PJ McCurdy, Kaleb Pattawi, Brian Woo-Shem, Hannah Covington
-Version:        5.40
-Last Updated:   2021-10-08 by Brian
+Version:        5.41
+Last Updated:   2022-05-23 by Brian
 Notes: Code for the optimization simulations. Should compile and run but may not have perfect results.
 Run:   Change file paths in this code. Then build or build-all. Run as part of federation.
 
@@ -165,7 +165,13 @@ public class Controller extends ControllerBase {
         char hcc = 'z';
         String dateRange = "";
         String loc = "";
-        char wholesaleType = 'z';
+        //char wholesaleType = 'z';
+        String priceType = "";
+        String pythonCommand = "python3";
+        boolean writeFile = false;
+        String optimizerFile = "energyOptTset2hr.py";
+        String setpointFile = "occupancyAdaptSetpoints.py";
+
         while ((st = br.readLine())!=null){
             log.info(st);
             if(st.contains("MODE:")){ //Use contains so tagline can have other instructions
@@ -185,15 +191,28 @@ public class Controller extends ControllerBase {
                 loc = br.readLine();
             }
             else if(st.contains("wholesale_type:")){
-                wholesaleType = br.readLine().charAt(0);
+                //wholesaleType = br.readLine().charAt(0);
+                priceType = br.readLine();
             }
+            else if(st.contains("python_command:")){
+                pythonCommand = br.readLine();
+            }
+            else if(st.contains("write_extra_data_files:")){
+                writeFile = Boolean.parseBoolean(br.readLine());
+            }
+            else if(st.contains("optimizer_code_file_name:")){
+				optimizerFile = br.readLine();
+			}
+			else if(st.contains("occupancy_adaptive_setpoints_code_file_name:")){
+				setpointFile = br.readLine();
+			}
         }
         log.info("Mode: " + mode);
         log.info("Heat or Cool: " + heatOrCool);
         log.info("Date Range: " + dateRange);
         log.info("Optimize: " + optimizeSet);
         log.info("Location: " + loc);
-        log.info("Wholesale Type: " + wholesaleType);
+        log.info("Energy Pricing Type: " + priceType);
         // if not optimizing, figure out occupancySet and adaptiveSet booleans. Note optimize uses only MODE, not occupancySet or adaptiveSet.
         if(!optimizeSet){
             if(mode.contains("occupancy")){ occupancySet = true;}
@@ -276,7 +295,7 @@ public class Controller extends ControllerBase {
             //    vController_Socket.sendInteraction(getLRC(), currentTime + getLookAhead());
 
             System.out.println("timestep before receiving Socket/Reader: "+ currentTime);
-            log.info("timestep before receiving Socket/Reader: ",currentTime);
+            //log.info("timestep before receiving Socket/Reader: ",currentTime);
             // Waits to receive Socket_Controller and Reader_Controller to ensure everything stays on the same timestep
             while (!(receivedSocket)){
                 //while ((!(receivedSocket) || !(receivedReader))){ // Reader stuff is commented out because Reader not currently used
@@ -388,7 +407,10 @@ public class Controller extends ControllerBase {
         } //End run autoHeatCool -------------------------------------------------------
 
         // Run Python Setpoints Code ---------------------------------------------------
-        if (optimizeSet || occupancySet){
+        // possibly get rid of this if statement and get rid of computing setpoints in controller java at all 
+        // because I don't trust it. & would make looping in the supercontroller easier. However this would be slower
+        // put adaptive here too because of problems with fuzzy with other method.
+        if (optimizeSet || occupancySet || adaptiveSet){
             // On the whole hours only, run the optimization ---------------------------
             if (hour%nopt == 0){
                 try {
@@ -408,10 +430,10 @@ public class Controller extends ControllerBase {
                     
                     // Call Python optimization & occupancy code with necessary info
                     if (optimizeSet){
-                         pycmd = "python3 ./energyOptTset2hr.py " + sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])+ " " + String.valueOf(24) + " " + timestepsToOpt + " " + hcc + " " + mode + " " + dateRange + " " + loc + " " + wholesaleType; 
+                         pycmd = "python3 ./energyOptTset2hr.py " + sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])+ " " + String.valueOf(24) + " " + timestepsToOpt + " " + hcc + " " + mode + " " + dateRange + " " + loc + " " + priceType; 
                     }
                     else{ // Call Python adaptive and occupancy setpoints code with necessary info
-                        pycmd = "python3 ./occupancyAdaptSetpoints.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])+ " " + String.valueOf(24) + " " + timestepsToOpt + " " + hcc + " " + mode + " " + dateRange + " " + loc + " " + wholesaleType;
+                        pycmd = "python3 ./occupancyAdaptSetpoints.py " +sday +" " +sblock +" "+ String.valueOf(zoneTemps[0])+ " " + String.valueOf(24) + " " + timestepsToOpt + " " + hcc + " " + mode + " " + dateRange + " " + loc + " " + priceType;
                     }
                     System.out.println("Run:  " + pycmd); //Display command used for debugging
                     pro = Runtime.getRuntime().exec(pycmd); // Runs command
@@ -484,35 +506,37 @@ public class Controller extends ControllerBase {
                     // End getting data from Python Setpoint Code ------------------------
                     
                     // Writing data to file _____________________________________________
-                    try{
-                        // Create new file in Deployment folder with name including description, time and date string - Brian
-                        // DataCVXOPT_mode_heatOrCool_YYYY-MM-DD_HH-mm.txt
-                        File cvxFile = new File("DataCVXOPT_"+mode+"_"+heatOrCool+"_"+datime+".txt");
+                    if (writeFile){
+                        try{
+                            // Create new file in Deployment folder with name including description, time and date string - Brian
+                            // DataCVXOPT_mode_heatOrCool_YYYY-MM-DD_HH-mm.txt
+                            File cvxFile = new File("DataCVXOPT_"+mode+"_"+heatOrCool+"_"+datime+".txt");
 
-                        // If file doesn't exists, then create it
-                        if (!cvxFile.exists()) {
-                            cvxFile.createNewFile();
-                            // Add headers and save them - Brian
+                            // If file doesn't exists, then create it
+                            if (!cvxFile.exists()) {
+                                cvxFile.createNewFile();
+                                // Add headers and save them - Brian
+                                FileWriter fw = new FileWriter(cvxFile.getAbsoluteFile(),true);
+                                BufferedWriter bw = new BufferedWriter(fw);
+                                bw.write("Energy_Consumption[J]\tIndoor_Temp_Prediction[°C]\tEnergy_Price[$]\tOutdoor_Temp[°C]\tSolarRadiation[W/m^2]\tMin_Heat_Setpt[°C]\tMax_Cool_Setpt[°C]\n");
+                                bw.close();
+                            }
+
                             FileWriter fw = new FileWriter(cvxFile.getAbsoluteFile(),true);
                             BufferedWriter bw = new BufferedWriter(fw);
-                            bw.write("Energy_Consumption[J]\tIndoor_Temp_Prediction[°C]\tEnergy_Price[$]\tOutdoor_Temp[°C]\tSolarRadiation[W/m^2]\tMin_Heat_Setpt[°C]\tMax_Cool_Setpt[°C]\n");
+
+                            // Write in file
+                            for (int in =0;in<13;in++) {
+                                bw.write(vars[in]+"\t"+varsT[in]+"\t"+varsP[in]+"\t"+varsO[in]+"\t"+varsS[in]+"\t"+varsH[in]+"\t"+varsC[in]+"\n");
+                            }
+                            // Close and save file
                             bw.close();
                         }
-
-                        FileWriter fw = new FileWriter(cvxFile.getAbsoluteFile(),true);
-                        BufferedWriter bw = new BufferedWriter(fw);
-
-                        // Write in file
-                        for (int in =0;in<13;in++) {
-                            bw.write(vars[in]+"\t"+varsT[in]+"\t"+varsP[in]+"\t"+varsO[in]+"\t"+varsS[in]+"\t"+varsH[in]+"\t"+varsC[in]+"\n");
-                        }
-                        // Close and save file
-                        bw.close();
-                    }
-                    catch(Exception e){
-                        System.out.println("Text Alert: Could not write DataCVXOPT.txt file.");
-                        System.out.println(e);
-                    } // End DataCVXOPT file ------------------------------------------------
+                        catch(Exception e){
+                            System.out.println("Text Alert: Could not write DataCVXOPT.txt file.");
+                            System.out.println(e);
+                        } 
+                    }// End DataCVXOPT file ------------------------------------------------
         
                     // resetting 
                     var2save = 'Z';
@@ -549,18 +573,18 @@ public class Controller extends ControllerBase {
 
             // Fuzzy control for Occupancy & Optimization _______________________________________________________
             // Brian rebuilt this so fuzzy doesn't replace the expanded occupancy comfort bounds with defaults
-            double max_cool_temp, min_heat_temp; 
+            //double max_cool_temp, min_heat_temp; 
             double OFFSET = 0.5; // need to change slightly higher/lower so E+ doesnt have issues
             for(int i=0;i<numSockets;i++){ // Loop so that it would hypothetically work if we ever add more EP sims at once
                 // Determine minimum and maximum temperatures allowed from optimization or occupancy output as 'heating setpoint bounds' and 'cooling setpoint bounds' - Brian
-                min_heat_temp = Double.parseDouble(varsH[p]); // [p] because p incremented since previous usage
-                max_cool_temp = Double.parseDouble(varsC[p]);
+                //min_heat_temp = Double.parseDouble(varsH[p]); // [p] because p incremented since previous usage
+                //max_cool_temp = Double.parseDouble(varsC[p]);
                 // Alternately it might actually supposed to be coolTemps and heatTemps?
                 // In which case would be identical to the non-optimized adaptive and fixed cases.
 
                 // Fuzzy cool and heat are global variables that toggle only when criteria is met.
                 if (hcc == 'c'){ //Cooling
-                    if (zoneTemps[i] >= max_cool_temp - 0.2){ // if likely to exceed maximum band
+                    if (zoneTemps[i] >= coolTemps[i] - 0.2){ // if likely to exceed maximum band
                         fuzzy_cool = -1;
                     } else if (zoneTemps[i] <= coolTemps[i]-1.1){ // if colder than necessary, allow to warm up
                         fuzzy_cool = 1;
@@ -569,7 +593,7 @@ public class Controller extends ControllerBase {
                     heatTemps[i] = 15.0; // IF COOLING for now to avoid turning on heat
                 }
                 else{ // Heating
-                    if (zoneTemps[i] <= min_heat_temp + 0.2){ // if likely to exceed minimum band
+                    if (zoneTemps[i] <= heatTemps[i] + 0.2){ // if likely to exceed minimum band
                         fuzzy_heat = 1;
                     } else if (zoneTemps[i] >= heatTemps[i]+1.1){
                         fuzzy_heat = -1;
@@ -655,8 +679,8 @@ public class Controller extends ControllerBase {
     
     //BEGIN APPLIANCE SCHEDULER ============================================================
     
-    System.out.println("TIMESTEP FOR APPLIANCE: " + (int)currentTime);
-    System.out.println("OCCUPANCY AT TIMESTEP: " + occupancyData.get((int)currentTime));
+    //System.out.println("TIMESTEP FOR APPLIANCE: " + (int)currentTime);
+    //System.out.println("OCCUPANCY AT TIMESTEP: " + occupancyData.get((int)currentTime));
     
     //clearing information from past day and getting new probability of activation
     //clearing past activations and finding new activation prob if it is a new day
@@ -673,7 +697,7 @@ public class Controller extends ControllerBase {
 	wakeTime = wakeTime + timestep*24;
 	System.out.println("DAY COUNTER: "+ dayCount);
 	activationProb = dailyActivationProb/timeStepsOccupied.get(dayCount-1);
-	System.out.println(activationProb);
+	//System.out.println(activationProb);
     }	
     //make sure activation history takes precedence
     if (activationHistory.size() > 0 && activationHistory.size() < runTime){
@@ -723,10 +747,10 @@ public class Controller extends ControllerBase {
 	    randomNumHistory.add(0.0);
 	}
     }
-    System.out.println("STATE HISTORY:");
-    System.out.println(stateHistory);
-    System.out.println("RANDOM NUMBERS:");
-    System.out.println(randomNumHistory);
+    //System.out.println("STATE HISTORY:");
+    //System.out.println(stateHistory);
+    //System.out.println("RANDOM NUMBERS:");
+    //System.out.println(randomNumHistory);
 
     //END APPLIANCE SCHEDULER =================================================================
     
@@ -772,6 +796,7 @@ public class Controller extends ControllerBase {
 
 
             // Writing data to file ______________________________________________________
+        if (writeFile){
             try{
                 // Create new file
                 // New file naming method that goes to Deployment folder and has the time and date string - Brian
@@ -800,7 +825,8 @@ public class Controller extends ControllerBase {
             catch(Exception e){
                 System.out.println(e);
                 System.out.println("Text Alert: Error when writing DataEP.txt file.");
-            } // End File Write -------------------------------------------------------------
+            } 
+        }// End File Write -------------------------------------------------------------
 
             ////////////////////////////////////////////////////////////////////
             // TODO break here if ready to resign and break out of while loop //
@@ -837,21 +863,21 @@ public class Controller extends ControllerBase {
         // Could make global var that holds simIDs but it would just be 0,1,2,...
         // int simID = 0;
         int simID = interaction.get_simID();
-        System.out.println("numVars[simID] = " + numVars[simID]);
+        //System.out.println("numVars[simID] = " + numVars[simID]);
         holder[simID] = interaction.get_dataString();
-        System.out.println("holder[simID] = "+ holder[simID] );
+        //System.out.println("holder[simID] = "+ holder[simID] );
 
-        System.out.println("handle interaction loop");
+        //System.out.println("handle interaction loop");
 
         String vars[] = holder[simID].split(doubleSeparator);
-        System.out.println("vars[0] = "+vars[0]);
+        //System.out.println("vars[0] = "+vars[0]);
         System.out.println("length of vars = " + vars.length);
         int j=0;
         for( String token : vars){
-            System.out.println("token = " +token);
+            //System.out.println("token = " +token);
             String token1[] = token.split(varNameSeparator);
-            System.out.println("token1[0] = "+token1[0]);
-            System.out.println("token1[1] = "+token1[1]);
+            //System.out.println("token1[0] = "+token1[0]);
+            //System.out.println("token1[1] = "+token1[1]);
             varNames[j] = token1[0];
             doubles[j] = token1[1];
             System.out.println("varNames[j] = "+ varNames[j] );
